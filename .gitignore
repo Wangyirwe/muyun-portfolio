@@ -1,0 +1,13 @@
+# 输出
+个人风格网站.zip
+*.log
+.DS_Store
+Thumbs.db
+node_modules/
+*.tmp
+
+# Trae / IDE 内部
+.trae/
+.trae-cn/
+.idea/
+.vscode/
