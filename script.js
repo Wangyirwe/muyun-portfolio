@@ -1305,8 +1305,9 @@ function initWorkModal() {
       applyTransform();
     });
   }
-  // 缩放条按钮也别冒泡
+  // 缩放条按钮也别冒泡到 media 的拖动 handler —— 桌面加 mousedown，触屏已有 touchstart/touchmove
   if (zoomBar) {
+    zoomBar.addEventListener('mousedown', (e) => { e.stopPropagation(); });
     zoomBar.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
     zoomBar.addEventListener('touchmove',  (e) => { e.stopPropagation(); }, { passive: true });
   }
