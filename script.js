@@ -2,6 +2,28 @@
    MUYUN Portfolio — Scripts
    ======================================== */
 
+/* ---------- 触屏：长按后清掉粘住的 :hover 状态（iOS Safari 经典 bug） ---------- */
+document.addEventListener('touchend', function() {
+  // 触发一次重绘，强制浏览器清除 hover 高亮
+  document.activeElement && document.activeElement.blur();
+  document.body.classList.remove('touch-hover');
+}, true);
+
+/* ---------- Hero 底部 Scroll 按钮 — 平滑滚动 ---------- */
+document.addEventListener('DOMContentLoaded', function() {
+  var h = document.querySelector('.scroll-hint');
+  if (!h) return;
+  h.addEventListener('click', function(e) {
+    e.preventDefault();
+    var t = document.querySelector('#works, section.works');
+    if (!t) return;
+    var nav = document.querySelector('.nav');
+    var nh = nav ? nav.getBoundingClientRect().height : 60;
+    var top = t.getBoundingClientRect().top + window.scrollY - nh;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  });
+});
+
 /* ---------- 滚动态修复：Edge 等系统浏览器滚轮锁死 ---------- */
 document.documentElement.classList.add('fonts-ready');
 document.body.classList.remove('loader-active');
@@ -392,6 +414,9 @@ empty.style.height = silentPh.offsetHeight + 'px';
 /* ---------- 卡片内部内容 hover 放大 + 鼠标方向偏移 ---------- */
 let _parallaxCleanups = [];
 function initCardParallax() {
+  // 触屏设备不需要鼠标 parallax
+  if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+
   // 清理上一次的事件监听
   _parallaxCleanups.forEach(fn => fn());
   _parallaxCleanups = [];
@@ -896,6 +921,9 @@ function initMobileMenu() {
   links.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => links.classList.remove('open'));
   });
+
+  // 点击侧边栏外关闭
+  let $navTouch = false; document.addEventListener('touchstart', (e) => { if (!links.classList.contains('open')) return; if (!links.contains(e.target) && !btn.contains(e.target)) { $navTouch = true; links.classList.remove('open'); } }); document.addEventListener('click', (e) => { if ($navTouch) { $navTouch = false; return; } if (!links.classList.contains('open')) return; if (!links.contains(e.target) && !btn.contains(e.target)) { links.classList.remove('open'); } });
 }
 
 /* ---------- 导航平滑滚动（自写 RAF，连点跳最新目标）---------- */
@@ -1016,7 +1044,7 @@ function initMailModal() {
   btn.addEventListener('click', open);
   closeBtn && closeBtn.addEventListener('click', close);
   // 点击遮罩关闭
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  let $modalTouch = false; modal.addEventListener('touchstart', (e) => { if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) { $modalTouch = true; close(); } }); modal.addEventListener('click', (e) => { if ($modalTouch) { $modalTouch = false; return; } if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close(); });
   // ESC 关闭
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
 
@@ -1082,7 +1110,7 @@ function initSkillModal() {
     tag.addEventListener('click', () => open(tag));
   });
   closeBtn && closeBtn.addEventListener('click', close);
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  let $modalTouch = false; modal.addEventListener('touchstart', (e) => { if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) { $modalTouch = true; close(); } }); modal.addEventListener('click', (e) => { if ($modalTouch) { $modalTouch = false; return; } if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
 }
 
@@ -1171,20 +1199,42 @@ function initWorkModal() {
   let isDragging = false;
   let dragStartX = 0, dragStartY = 0;
   let panStartX = 0, panStartY = 0;
+  // contain 等价的基础宽度百分比（1.0×zoom=1 时）
+  let containBasePercent = 100;
+
+  // 触屏缩放控件引用（提前声明供 resetTransform 使用）
+  const $isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const zoomSlider = document.getElementById('workModalZoomSlider');
+  const zoomBar = document.getElementById('workModalZoomBar');
+
+  // 根据图片和容器宽高比计算 contain 等价的基础百分比
+  function calcContainBase(imgW, imgH) {
+    const rect = media.getBoundingClientRect();
+    const imgRatio = imgW / imgH;
+    const boxRatio = rect.width / rect.height;
+    if (imgRatio > boxRatio) {
+      // 图片更宽：contain 时宽度填满容器 → base = 100%
+      return 100;
+    } else {
+      // 图片更高：contain 时高度填满容器，宽度 = 容器高×图片比 → 换算成容器宽度的百分比
+      return (rect.height * imgRatio / rect.width) * 100;
+    }
+  }
 
   const resetTransform = () => {
     zoom = 1; panX = 0; panY = 0;
-    media.style.backgroundSize = 'contain';
+    media.style.backgroundSize = `${containBasePercent}%`;
     media.style.backgroundPosition = 'center center';
-    media.style.cursor = 'default';
+    media.style.cursor = 'grab';
     void media.offsetWidth; // 强制 reflow，确保样式立即落地
+    if (zoomSlider) zoomSlider.value = 100;
   };
   const applyTransform = () => {
-    media.style.backgroundSize = `${zoom * 100}%`;
+    media.style.backgroundSize = `${zoom * containBasePercent}%`;
     media.style.backgroundPosition = `calc(50% + ${panX}px) calc(50% + ${panY}px)`;
   };
 
-  // 滚轮缩放
+  // 滚轮缩放（桌面：以鼠标位置为锚点）
   media.addEventListener('wheel', (e) => {
     if (!media.style.backgroundImage) return;
     e.preventDefault();
@@ -1192,13 +1242,11 @@ function initWorkModal() {
     const newZoom = Math.max(1, Math.min(6, zoom + delta));
     if (newZoom === zoom) return;
 
-    // 以鼠标位置为缩放中心
     const rect = media.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    // 原来的 "mouse 相对中心" 的偏移，按缩放比例折算
     const ratio = newZoom / zoom;
     panX = mx - cx - (mx - cx - panX) * ratio;
     panY = my - cy - (my - cy - panY) * ratio;
@@ -1206,10 +1254,9 @@ function initWorkModal() {
     applyTransform();
   }, { passive: false });
 
-  // 拖动
+  // 拖动（自由拖动，不管缩放比例）
   media.addEventListener('mousedown', (e) => {
     if (!media.style.backgroundImage) return;
-    if (zoom <= 1) { resetTransform(); return; }
     e.preventDefault();
     isDragging = true;
     dragStartX = e.clientX;
@@ -1227,8 +1274,89 @@ function initWorkModal() {
   window.addEventListener('mouseup', () => {
     if (!isDragging) return;
     isDragging = false;
-    media.style.cursor = zoom > 1 ? 'grab' : 'default';
+    media.style.cursor = 'grab';
   });
+  media.style.cursor = 'grab';
+
+  /* ---------- 触屏：单指拖动 + 滑动条缩放 ---------- */
+  const syncSlider = () => { if (zoomSlider) zoomSlider.value = Math.round(zoom * 100); };
+  // 以容器中心为锚点：pan 按 zoom 比例折算，保证容器中心那一点始终对准
+  const applyZoom = (z) => {
+    const oldZoom = zoom;
+    zoom = Math.max(1, Math.min(6, z));
+    const ratio = zoom / oldZoom;
+    panX = panX * ratio;
+    panY = panY * ratio;
+    applyTransform();
+    syncSlider();
+  };
+
+  // Slider 拖动缩放（以容器中心为锚点 → pan 按比例折算）
+  if (zoomSlider) {
+    zoomSlider.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+    zoomSlider.addEventListener('touchmove',  (e) => { e.stopPropagation(); }, { passive: true });
+    zoomSlider.addEventListener('input', (e) => {
+      const oldZoom = zoom;
+      const newZoom = parseFloat(e.target.value) / 100;
+      const ratio = newZoom / oldZoom;
+      panX = panX * ratio;
+      panY = panY * ratio;
+      zoom = newZoom;
+      applyTransform();
+    });
+  }
+  // 缩放条按钮也别冒泡
+  if (zoomBar) {
+    zoomBar.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+    zoomBar.addEventListener('touchmove',  (e) => { e.stopPropagation(); }, { passive: true });
+  }
+
+  // + − ⟲ 按钮
+  if (zoomBar) {
+    const btnOut = zoomBar.querySelector('.zoom-out');
+    const btnIn  = zoomBar.querySelector('.zoom-in');
+    const btnRst = zoomBar.querySelector('.zoom-reset');
+    if (btnIn)  btnIn.addEventListener('click',  () => applyZoom(zoom + 0.3));
+    if (btnOut) btnOut.addEventListener('click', () => applyZoom(zoom - 0.3));
+    if (btnRst) btnRst.addEventListener('click', () => { resetTransform(); syncSlider(); });
+  }
+
+  // 触屏单指拖动（禁用双指 pinch 缩放）
+  if ($isTouch) {
+    let touchStartX = 0, touchStartY = 0, touchPanStartX = 0, touchPanStartY = 0;
+    let touchActive = false;
+    let pinchActive = false;
+
+    media.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        pinchActive = false;
+        touchActive = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchPanStartX = panX;
+        touchPanStartY = panY;
+      } else if (e.touches.length === 2) {
+        pinchActive = true; // 吞掉 pinch，让用户用 slider
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    media.addEventListener('touchmove', (e) => {
+      if (pinchActive && e.touches.length >= 2) { e.preventDefault(); return; }
+      if (!touchActive || e.touches.length !== 1) return;
+      e.preventDefault();
+      panX = touchPanStartX + (e.touches[0].clientX - touchStartX);
+      panY = touchPanStartY + (e.touches[0].clientY - touchStartY);
+      applyTransform();
+    }, { passive: false });
+
+    const endTouch = () => { touchActive = false; pinchActive = false; };
+    media.addEventListener('touchend', endTouch);
+    media.addEventListener('touchcancel', endTouch);
+  }
+
+  // resetTransform 内部已同步 slider
+  syncSlider();
 
   const navPrev = modal.querySelector('.work-modal-prev');
   const navNext = modal.querySelector('.work-modal-next');
@@ -1241,11 +1369,23 @@ function initWorkModal() {
     if (src) {
       media.style.backgroundImage = `url(${src})`;
       media.dataset.label = '';
-      media.style.cursor = 'default';
+      media.style.cursor = 'grab';
+      // 异步加载图片拿到 naturalWidth/Height，计算 contain 基础百分比
+      // 用闭包保护避免快速切图时回调串台
+      var $thisSrc = src;
+      var $preload = new Image();
+      $preload.onload = function() {
+        if (media.style.backgroundImage && media.style.backgroundImage.indexOf($thisSrc) === -1) return; // 已切下一张
+        // rAF 等弹窗完全展开后再量尺寸
+        requestAnimationFrame(function() {
+          containBasePercent = calcContainBase($preload.naturalWidth, $preload.naturalHeight);
+          resetTransform();
+        });
+      };
+      $preload.src = src;
     } else {
       media.style.backgroundImage = 'none';
     }
-    resetTransform();
   };
 
   const updateNav = () => {
@@ -1333,7 +1473,17 @@ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(card); }
   renderWorks = function() { origRender(); bindCards(); };
 
   closeBtn && closeBtn.addEventListener('click', close);
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  // backdrop 拦截所有触摸，防止穿透到下层作品卡片；点空白关闭弹窗
+  modal.addEventListener('touchstart', (e) => {
+    if (e.target === modal) { e.preventDefault(); close(); return; }
+    const dialog = modal.querySelector('[role="dialog"]');
+    if (dialog && !dialog.contains(e.target)) { e.preventDefault(); close(); return; }
+  }, { passive: false });
+  let $modalTouch = false;
+  modal.addEventListener('click', (e) => {
+    if ($modalTouch) { $modalTouch = false; return; }
+    if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close();
+  });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
 }
 

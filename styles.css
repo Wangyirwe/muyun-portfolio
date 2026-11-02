@@ -1,4 +1,4 @@
-﻿/* ========================================
+/* ========================================
    MUYUN Portfolio — Stylesheet
    Pure Black & White · Editorial Brutalist
    ======================================== */
@@ -53,7 +53,7 @@
 }
 
 /* ---------- Reset ---------- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 html, body {
   /* overscroll-behavior-y: contain 在 Edge 某些版本会锁死滚动，先去掉 */
@@ -63,6 +63,7 @@ html, body {
   /* 强制经典滚动条（Edge/Chrome overlay scrollbar 默认自动隐藏） */
   scrollbar-width: thin;
   scrollbar-color: #a8a8a8 transparent;
+  -webkit-touch-callout: none;
 }
 
 /* WebKit 滚动条（Edge/Chrome/Safari）——始终显示 */
@@ -391,7 +392,7 @@ body.has-modal .nav {
   width: 22px;
   height: 1.5px;
   background: currentColor;
-  transition: transform .3s;
+  transition: transform .3s, background-color .35s ease;
 }
 
 /* ---------- Hero —— 深色区 ---------- */
@@ -864,6 +865,8 @@ section.works > * {
 }
 .works .section-head .section-title {
   justify-self: end;
+  position: relative;
+  top: -50px;
 }
 .works .section-head .works-filters {
   justify-self: start;
@@ -911,6 +914,10 @@ section.works > * {
   letter-spacing: .15em;
   text-transform: uppercase;
   color: var(--ink-muted);
+}
+.works-filters .section-num {
+  position: relative;
+  top: -30px;
 }
 
 .section-title {
@@ -1934,6 +1941,9 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 }
 
 .skill-row-wrap {
+  /* 只有最后一行需要底部虚线（其他行用 .skill-row 的 border-top） */
+}
+.skill-row-wrap:last-child {
   border-bottom: 1px dashed var(--line-light);
 }
 
@@ -1943,10 +1953,16 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   gap: 48px;
   align-items: center;
   padding: 28px 0;
+  border-top: 1px dashed var(--line-light);
   transition: background .3s;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* 第一行和 skills 容器自身 border-top 叠层变粗 — 去掉第一行 */
+.skill-row-wrap:first-child .skill-row {
+  border-top: none;
 }
 
 .skill-row:hover {
@@ -2146,11 +2162,22 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   background: none;
   border: none;
   color: rgba(255,255,255,0.5);
-  font-size: 24px;
-  line-height: 1;
   cursor: pointer;
   transition: color 0.15s;
 }
+.mail-modal-close::before,
+.mail-modal-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.mail-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.mail-modal-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 .mail-modal-close:hover {
   color: #fff;
 }
@@ -2275,11 +2302,22 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   background: none;
   border: none;
   color: rgba(255,255,255,0.5);
-  font-size: 24px;
-  line-height: 1;
   cursor: pointer;
   transition: color 0.15s;
 }
+.skill-modal-close::before,
+.skill-modal-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.skill-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.skill-modal-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 .skill-modal-close:hover {
   color: #fff;
 }
@@ -2362,6 +2400,8 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   align-items: center;
   opacity: 0;
   pointer-events: none;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
   transition: opacity 0.28s ease;
 }
 .work-modal.open {
@@ -2378,6 +2418,8 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   border: 1px solid rgba(255,255,255,0.2);
   display: flex;
   overflow: hidden;
+  touch-action: auto;
+  -webkit-tap-highlight-color: transparent;
   transform: translateY(24px) scale(0.96);
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -2393,12 +2435,23 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   background: none;
   border: none;
   color: rgba(255,255,255,0.5);
-  font-size: 26px;
-  line-height: 1;
   cursor: pointer;
   transition: color 0.15s;
   z-index: 2;
 }
+.work-modal-close::before,
+.work-modal-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.work-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.work-modal-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 .work-modal-close:hover {
   color: #fff;
 }
@@ -2413,34 +2466,18 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   position: relative;
   overflow: hidden;
 }
-.work-modal-zoom-hint {
-  position: absolute;
-  left: 18px;
-  bottom: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.4);
-  background: rgba(0,0,0,0.45);
+/* 统一胶囊底（nav / counter / zoom-bar 共用视觉） */
+.work-modal-nav,
+.work-modal-counter,
+.work-modal-zoom-bar {
+  background: rgba(26,26,30,.72);
+  border: 1px solid rgba(255,255,255,.18);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 5px 10px 5px 7px;
-  border-radius: 999px;
-  user-select: none;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .3s ease;
+  z-index: 3;
 }
-.work-modal.open .work-modal-zoom-hint {
-  opacity: 1;
-}
-.work-modal-media:hover .work-modal-zoom-hint {
-  opacity: 1;
-}
+
+/* 翻页圆按钮 */
 .work-modal-nav {
   position: absolute;
   top: 50%;
@@ -2448,45 +2485,147 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(26,26,30,.72);
   color: #fff;
-  border: 1px solid rgba(255,255,255,.18);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
   transition: opacity .25s ease, background .2s ease, transform .2s ease;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  z-index: 3;
 }
 .work-modal-nav:hover { background: #fff; color: #1a1a1e; transform: translateY(-50%) scale(1.06); }
 .work-modal-media:hover .work-modal-nav { opacity: 1; }
 .work-modal-prev { left: 18px; }
 .work-modal-next { right: 18px; }
+
+/* 右下 1/N counter（胶囊） */
 .work-modal-counter {
   position: absolute;
   right: 18px;
   bottom: 16px;
-  padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(26,26,30,.72);
   color: #fff;
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: .02em;
-  border: 1px solid rgba(255,255,255,.18);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity .25s ease;
-  z-index: 3;
 }
 .work-modal-media:hover .work-modal-counter { opacity: 1; }
+
+/* 左下 zoom-bar 胶囊 */
+.work-modal-zoom-bar,
+.work-modal-counter {
+  padding: 4px 16px;
+  min-height: 32px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+.work-modal-zoom-bar {
+  gap: 4px;
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity .25s ease;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+  letter-spacing: .03em;
+  user-select: none;
+}
+.work-modal-media:hover .work-modal-zoom-bar { opacity: 1; }
+
+.zoom-bar-hint { white-space: nowrap; padding: 0 3px; }
+.zoom-bar-hint.hint-touch { display: none; }
+
+.zoom-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+.zoom-btn:hover { background: rgba(255,255,255,.2); }
+.zoom-btn:active { background: rgba(255,255,255,.3); }
+.zoom-btn.zoom-reset { font-size: 12px; }
+
+.zoom-slider {
+  width: 70px;
+  height: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,.3);
+  border-radius: 2px;
+  outline: none;
+}
+.zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #1a1a1e;
+  cursor: pointer;
+}
+.zoom-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #1a1a1e;
+  cursor: pointer;
+}
+
+/* ============ 桌面端（hover+fine pointer） ============ */
+@media (hover: hover) and (pointer: fine) {
+  .work-modal-zoom-bar .zoom-slider,
+  .work-modal-zoom-bar .zoom-out,
+  .work-modal-zoom-bar .zoom-in {
+    display: none !important;
+  }
+}
+
+/* ============ 触屏端 ============ */
+@media (hover: none) and (pointer: coarse) {
+  .work-modal-counter { opacity: 1 !important; }
+  .work-modal-zoom-bar { opacity: 1 !important; }
+  .work-modal-zoom-bar .zoom-bar-hint.hint-desk { display: none; }
+  .work-modal-zoom-bar .zoom-bar-hint.hint-touch { display: none; }
+  .work-modal-zoom-bar .zoom-slider { width: 120px; }
+
+  /* zoom-bar 内按钮：hover/focus 强制回原样，:active 瞬间亮一下就消失 */
+  .work-modal-zoom-bar button,
+  .work-modal-zoom-bar button:hover,
+  .work-modal-zoom-bar button:focus,
+  .work-modal-zoom-bar button:focus-visible {
+    background: transparent !important;
+    color: rgba(255,255,255,.55) !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .work-modal-zoom-bar button:active {
+    color: #fff !important;
+    transform: scale(0.92) !important;
+    background: rgba(255,255,255,.1) !important;
+    transition: none !important;
+  }
+}
 .work-modal-info {
   flex: 1;
-  padding: 44px 40px 32px;
+  padding: 44px 20px 32px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -2541,6 +2680,10 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   line-height: 1.95;
   color: rgba(255,255,255,0.75);
   flex: 1;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  hanging-punctuation: first last;
+  text-indent: 0;
 }
 .work-modal-foot {
   margin-top: 28px;
@@ -2636,9 +2779,23 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   max-width: 360px;
 }
 
+.contact-notice-mobile {
+  display: none;
+}
+
 .contact-main {
   max-width: none;
-  margin-top: 80px;   /* 整体下移 */
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.contact-phone-img {
+  display: none;
+}
+.contact-lead-wrap {
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-lead {
@@ -2829,9 +2986,15 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   section { padding: 80px var(--gutter); }
   section.works { padding-top: 120px; padding-bottom: 180px; }
+
+  /* 平板竖屏/横屏都换吊灯 */
+  .desk-lamp { display: none !important; }
+
+  /* 电话亭图片右移，别贴边 */
+  .phone-booth-img { margin-left: -80px; margin-top: -280px; width: clamp(340px, 40vw, 460px); }
 
   .about-body {
     grid-template-columns: 1fr;
@@ -2904,8 +3067,8 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   .nav-links .nav-link { font-size: 14px; color: var(--ink); }
 
   .nav-menu-btn { display: flex; z-index: 101; }
-  .nav-links.open + .nav-menu-btn span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .nav-links.open + .nav-menu-btn span:nth-child(2) { transform: translateY(-1px) rotate(-45deg); }
+  .nav-links.open + .nav-menu-btn span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: #fff; }
+  .nav-links.open + .nav-menu-btn span:nth-child(2) { transform: translateY(-1px) rotate(-45deg); background: #fff; }
 
   .nav { color: var(--ink); }
 
@@ -2970,44 +3133,56 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
     margin-top: 12px;
   }
 
-  /* 手机版作品弹窗：整体缩小，上下缩得更多 */
+  /* 手机版作品弹窗：上下缩小 */
   .work-modal-card {
-    width: 92vw !important;
-    max-height: none !important;
+    width: 86vw !important;
+    max-height: 70vh !important;
     height: auto !important;
     flex-direction: column;
-    overflow: visible !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
   }
   .work-modal-media {
     flex: none;
-    aspect-ratio: 4/3;
+    aspect-ratio: 16/10;
     width: 100%;
+    border-right: none !important;
   }
   .work-modal-info {
-    padding: 18px 20px !important;
-    flex: none;
+    padding: 8px 14px !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
   .work-modal-title {
-    font-size: 18px !important;
+    font-size: 14px !important;
+    word-break: break-all;
+    overflow-wrap: break-word;
   }
   .work-modal-num,
   .work-modal-tag {
-    font-size: 10px !important;
+    font-size: 8px !important;
   }
   .work-modal-keywords {
-    gap: 4px !important;
-    margin-top: 10px !important;
+    gap: 2px !important;
+    margin-top: 4px !important;
+  }
+  .work-modal-key {
+    font-size: 8px !important;
+    padding: 0 5px !important;
   }
   .work-modal-detail {
-    font-size: 12px !important;
-    margin-top: 8px !important;
+    font-size: 10px !important;
+    margin-top: 4px !important;
     padding: 0 !important;
+    line-height: 1.4 !important;
     max-height: none !important;
-    overflow: visible !important;
+    overflow-y: visible !important;
   }
   .work-modal-nav {
-    width: 32px !important;
-    height: 32px !important;
+    width: 26px !important;
+    height: 26px !important;
     font-size: 14px !important;
   }
   .work-modal-close {
@@ -3016,6 +3191,12 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   }
   .work-modal-counter {
     font-size: 10px !important;
+  }
+  .work-modal-foot {
+    margin-top: 8px !important;
+    padding-top: 6px !important;
+    font-size: 7px !important;
+    letter-spacing: 0.12em !important;
   }
 
   /* 手机版技能弹窗 */
@@ -3154,9 +3335,23 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 
   .contact-lead-cn { font-size: clamp(22px, 6vw, 36px); padding-bottom: 16px; }
   .contact-lead-en { font-size: clamp(8px, 2.2vw, 10px) !important; margin-top: 8px; max-width: 80%; margin-left: auto; }
-  .contact-lead { margin-top: 80px; margin-bottom: 32px; position: relative; z-index: 2; text-align: right; }
+  .contact-main { flex-direction: row; align-items: flex-start; gap: 16px; }
+  .contact-phone-img {
+    display: block;
+    flex-shrink: 0;
+    width: 120px;
+    height: 260px;
+    background-image: url("assets/contact-phone.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    margin-top: 60px;
+  }
+  .contact-lead-wrap { flex: 1; min-width: 0; }
+  .contact-lead { margin-top: 60px; margin-bottom: 32px; position: relative; z-index: 2; text-align: right; }
   .contact-send-btn { position: relative; margin-top: 120px; margin-left: auto; margin-right: 0; bottom: auto; right: auto; display: block; width: fit-content; }
   .contact-notice { position: static; margin-top: 24px; font-size: 7px; max-width: 180px; line-height: 1.3; letter-spacing: .06em; text-align: right; margin-left: auto; margin-right: 0; }
+  .contact-notice-mobile { display: block; font-family: var(--font-mono); font-size: 7px; letter-spacing: .06em; color: var(--ink-muted); text-align: right; margin-top: 6px; margin-left: auto; margin-right: 0; }
   .contact { padding-bottom: 40px; }
   .hanging-phone { display: none !important; }
   .phone-booth-img { display: none !important; }
@@ -3178,6 +3373,26 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
   .footer-inner,
   .filter-tabs,
   .works-filters { max-width: 100% !important; width: 100% !important; }
+
+  /* About 照片放大到接近满宽 */
+  .about-placeholder { max-width: 95vw !important; }
+  .contact-phone-img { width: 95px; height: 210px; margin-top: 30px; }
+  .contact-main { gap: 10px; }
+  .contact-lead { margin-top: 50px; }
+}
+
+/* iPhone SE / 矮屏手机：外框不变，图片区缩小让出高度给信息区 */
+@media (max-width: 380px) {
+  .work-modal-card {
+    max-height: 78vh !important;
+  }
+  .work-modal-media {
+    aspect-ratio: 4/1 !important;
+  }
+  .work-modal-info {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
 }
 
 
@@ -3314,11 +3529,11 @@ body.filter-graphic    .xiaohei-cat {
 
 /* ============================================================
    手机版顶部吊灯（钟摆摇摆 + 锥形光束扫光 + GodRay）
-   只在 ≤768px 显示
+   平板竖屏 + 手机都显示（≤1024px 竖屏 或 ≤768px）
    ============================================================ */
 .pendant-lamp { display: none; }
 
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
   .pendant-lamp {
     display: block;
     position: absolute;
@@ -3457,4 +3672,84 @@ body.filter-graphic    .xiaohei-cat {
 @keyframes beamPulse {
   0%, 100% { opacity: .9; }
   50%      { opacity: .4; }
+}
+
+/* 触屏设备：切换操作提示 */
+.hint-touch { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .hint-desk { display: none; }
+  .hint-touch { display: inline; }
+
+  /* 触屏上 :hover / :focus / :focus-visible 都清掉 — 不会粘住高亮 */
+  *:hover,
+  *:focus,
+  *:focus-visible {
+    /* 不注册任何 hover/focus 视觉变化 */
+  }
+
+  /* 技能行 — 只有 :active 一瞬间有反馈 */
+  .skill-row:hover,
+  .skill-row:focus,
+  .skill-row:focus-visible { background: transparent; }
+  .skill-row:active { background: var(--paper-light) !important; }
+
+  .tool-tag:hover,
+  .tool-tag:focus,
+  .tool-tag:focus-visible { background: var(--bg-light); color: var(--ink); border-color: var(--line-dark); }
+  .tool-tag:active { background: #1a1a1e !important; color: #fff !important; border-color: #1a1a1e !important; transform: scale(0.94); }
+
+  /* 弹窗内所有按钮：触屏上 hover/focus 强制清除，:active 短暂高亮回馈 */
+  .work-modal-close:hover, .work-modal-close:focus, .work-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
+  .work-modal-close:active { color: #fff !important; }
+
+  .skill-modal-close:hover, .skill-modal-close:focus, .skill-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
+  .skill-modal-close:active { color: #fff !important; }
+
+  .mail-modal-close:hover, .mail-modal-close:focus, .mail-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
+  .mail-modal-close:active { color: #fff !important; }
+
+  .work-modal-nav { opacity: 1 !important; }
+  .work-modal-nav:hover, .work-modal-nav:focus, .work-modal-nav:focus-visible {
+    background: rgba(26,26,30,.72) !important;
+    color: #fff !important;
+    transform: translateY(-50%) !important;
+    outline: none !important;
+  }
+  .work-modal-nav:active { background: #fff !important; color: #1a1a1e !important; transform: translateY(-50%) scale(0.96) !important; }
+
+  .mail-modal-btn:hover, .mail-modal-btn:focus, .mail-modal-btn:focus-visible { background: transparent !important; color: inherit !important; outline: none !important; }
+  .mail-modal-btn:active { background: rgba(255,255,255,0.1) !important; }
+
+  /* 禁用卡片 parallax — 触屏没有鼠标 */
+  .work-placeholder > *:not(.gmrk) {
+    transform: none !important;
+  }
+  .work-placeholder:hover > *:not(.gmrk) {
+    transform: none !important;
+  }
+  .works-grid.filter-graphic .work-placeholder:hover .illust-card-inner {
+    transform: none !important;
+  }
+
+  /* pill 常亮显示 */
+  .work-card::before {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+  }
+
+  /* about 照片 hover 也禁掉 + 手机版填满画框 */
+  .about-photo::before,
+  .about-photo:hover::before {
+    transform: scale(1.6) !important;
+    background-position: center -35% !important;
+    background-size: cover !important;
+  }
+
+  /* 点击卡片的按压反馈 */
+  .work-card:active .work-placeholder,
+  .work-placeholder:active {
+    transform: scale(0.96);
+    transition: transform .12s ease-out;
+  }
 }
