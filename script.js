@@ -1311,14 +1311,19 @@ function initWorkModal() {
     zoomBar.addEventListener('touchmove',  (e) => { e.stopPropagation(); }, { passive: true });
   }
 
-  // + − ⟲ 按钮
+  // + − ⟲ 按钮 —— 同时监听 click 和 touchend，touchend 里 preventDefault 阻止 iOS Safari 吞事件
   if (zoomBar) {
     const btnOut = zoomBar.querySelector('.zoom-out');
     const btnIn  = zoomBar.querySelector('.zoom-in');
     const btnRst = zoomBar.querySelector('.zoom-reset');
-    if (btnIn)  btnIn.addEventListener('click',  () => applyZoom(zoom + 0.3));
-    if (btnOut) btnOut.addEventListener('click', () => applyZoom(zoom - 0.3));
-    if (btnRst) btnRst.addEventListener('click', () => { resetTransform(); syncSlider(); });
+    const bindPress = (el, handler) => {
+      if (!el) return;
+      el.addEventListener('click', handler);
+      el.addEventListener('touchend', (e) => { e.preventDefault(); handler(e); }, { passive: false });
+    };
+    bindPress(btnIn,  () => applyZoom(zoom + 0.3));
+    bindPress(btnOut, () => applyZoom(zoom - 0.3));
+    bindPress(btnRst, () => { resetTransform(); syncSlider(); });
   }
 
   // 触屏单指拖动（禁用双指 pinch 缩放）
