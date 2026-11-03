@@ -1034,6 +1034,7 @@ function initMailModal() {
     document.body.classList.add('has-modal');
   };
   const close = () => {
+    document.activeElement?.blur();
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('has-modal');
@@ -1100,6 +1101,7 @@ function initSkillModal() {
   };
 
   const close = () => {
+    document.activeElement?.blur();
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('has-modal');
@@ -1457,6 +1459,7 @@ function initWorkModal() {
   };
 
   const close = () => {
+    document.activeElement?.blur();
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('has-modal');
