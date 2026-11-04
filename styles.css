@@ -355,66 +355,62 @@ body.loader-active {
   100% { background-position: -60% 0; }
 }
 
-/* 主编排：首尾帧完全一致 —— 无缝循环 */
+/* 主编排：每轮字母只出现一次、只消失一次；首尾帧一致，无缝循环 */
 @keyframes loaderKinetic {
-  /* 帧 0：散块在两侧（起点 = 终点） */
+  /* 帧 0：散块在两侧隐身（起点 = 终点） */
   0% {
     opacity: 0;
     transform: translate3d(var(--dx), .5em, 0) scale(.3) rotate(var(--rot)) rotateY(-70deg);
   }
   /* 帧 1：向中心飞入并轻微过冲 */
-  10% {
+  8% {
     opacity: 1;
     transform: translate3d(0, -.05em, 0) scale(1.15) rotate(0deg) rotateY(0deg);
   }
   /* 帧 2：落位成字 */
-  18% {
+  16% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
   }
   /* 帧 3：轻微呼吸 */
-  26% {
+  24% {
     opacity: 1;
     transform: translate3d(0, -.09em, 0) scale(1.03) rotate(0deg) rotateY(0deg);
   }
   /* 帧 4：3D 翻面波 */
-  36% {
+  33% {
     opacity: 1;
     transform: translate3d(0, 0, 24px) scale(1.05) rotate(0deg) rotateY(-26deg);
   }
-  44% {
+  41% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
   }
   /* 帧 5：横向拉伸 → 纵向压扁蓄力 */
-  52% {
+  48% {
     opacity: 1;
     transform: translate3d(0, .07em, 0) scaleY(.68) scaleX(1.22) rotate(0deg) rotateY(0deg);
   }
   /* 帧 6：朝各自方向弹射飞散 */
-  62% {
-    opacity: .9;
-    transform: translate3d(calc(var(--dx) * .8), -.5em, 0) scale(.55) rotate(var(--rot)) rotateY(45deg);
+  58% {
+    opacity: 1;
+    transform: translate3d(calc(var(--dx) * .8), -.5em, 0) scale(.62) rotate(var(--rot)) rotateY(45deg);
   }
   70% {
+    opacity: .55;
+    transform: translate3d(var(--dx), -.1em, 0) scale(.34) rotate(calc(var(--rot) * 1.2)) rotateY(30deg);
+  }
+  /* 帧 7：散尽 —— 字母消失，只留几何粒子 */
+  80% {
+    opacity: .12;
+    transform: translate3d(var(--dx), .75em, 0) scale(.16) rotate(calc(var(--rot) * 1.6)) rotateY(10deg);
+  }
+  86% {
     opacity: 0;
-    transform: translate3d(var(--dx), .75em, 0) scale(.12) rotate(calc(var(--rot) * 1.6)) rotateY(20deg);
+    transform: translate3d(var(--dx), .9em, 0) scale(.1) rotate(calc(var(--rot) * 1.6)) rotateY(0deg);
   }
-  /* 帧 7：空场（几何粒子登场） */
-  78% {
-    opacity: 0;
-    transform: translate3d(var(--dx), .95em, 0) scale(.16) rotate(var(--rot)) rotateY(0deg);
-  }
-  /* 帧 8：二次归位 */
-  88% {
-    opacity: 1;
-    transform: translate3d(0, -.04em, 0) scale(1.12) rotate(0deg) rotateY(0deg);
-  }
-  94% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
-  }
-  /* 帧 9 = 帧 0，闭合循环 */
+  /* 帧 8：隐身到本轮结束，下一次出现交给循环重启后的帧 1
+     —— 这样「消失后只出现一次」，不会连出两遍 */
   100% {
     opacity: 0;
     transform: translate3d(var(--dx), .5em, 0) scale(.3) rotate(var(--rot)) rotateY(-70deg);
