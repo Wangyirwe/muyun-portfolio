@@ -1900,31 +1900,42 @@ function initLoader() {
     window.addEventListener('load', unlockFonts);
   }
 
-  let progress = 1;
+  // 进度按时间推进：为了让 4.2s 的字母编排完整播放一轮再进场，
+  // 这里用 4.5s 走完 1% → 100%，最后再定格组装态并上滑。
+  const DURATION = 4500;
+  const startT = performance.now();
+
+  const finish = () => {
+    countEl.textContent = '100%';
+    loader.classList.add('is-finishing'); // 字母定格为「组装完成」静态帧
+    setTimeout(() => {
+      loader.classList.add('done');
+      // 强制回到顶部并解除锁定，保证用户第一眼看到首屏
+      window.scrollTo(0, 0);
+      document.body.classList.remove('loader-active');
+      // loader 结束后再初始化页脚抖动，避免 canvas 尺寸为 0 的白屏
+      initFooterDither();
+      // 清除 <head> 里的内联 FOUC 锁定样式（它用了 !important，class 覆盖不了）
+      const fouc = document.querySelector('head style');
+      if (fouc) fouc.textContent = '';
+      // 同时触发 Hero 入场动画
+      document.body.classList.add('hero-in');
+    }, 420);
+  };
+
   const tick = () => {
-    progress += Math.random() * 8 + 2;
-    if (progress >= 100) progress = 100;
+    const t = Math.min(1, (performance.now() - startT) / DURATION);
+    // 前段快、收尾慢的缓动，读起来更像真实加载
+    const progress = 1 + (1 - Math.pow(1 - t, 1.9)) * 99;
     countEl.textContent = Math.floor(progress) + '%';
-    if (progress < 100) {
-      setTimeout(tick, 40 + Math.random() * 60);
+    if (t < 1) {
+      setTimeout(tick, 33);
     } else {
-      // 到 100% 后稍等一瞬，然后拉窗向上
-      setTimeout(() => {
-loader.classList.add('done');
-// 强制回到顶部并解除锁定，保证用户第一眼看到首屏
-window.scrollTo(0, 0);
-document.body.classList.remove('loader-active');
-// loader 结束后再初始化页脚抖动，避免 canvas 尺寸为 0 的白屏
-initFooterDither();
-// 清除 <head> 里的内联 FOUC 锁定样式（它用了 !important，class 覆盖不了）
-const fouc = document.querySelector('head style');
-if (fouc) fouc.textContent = '';
-// 同时触发 Hero 入场动画
-document.body.classList.add('hero-in');
-      }, 200);
+      finish();
     }
   };
-  setTimeout(tick, 100);
+
+  setTimeout(tick, 60);
 }
 
 /* ---------- 加载页老电视失真前景（跳变彩块 + 撕裂带 + 雪花点）---------- */

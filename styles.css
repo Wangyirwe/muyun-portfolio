@@ -421,6 +421,22 @@ body.loader-active {
   }
 }
 
+/* 收尾帧：动画停下来，字母定格在「组装完成」的静态状态 */
+.loader.is-finishing .loader-logo span {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+.loader.is-finishing .loader-shapes i {
+  animation: none;
+  opacity: 0;
+}
+.loader.is-finishing .loader-halo {
+  animation: none;
+  opacity: .5;
+  transform: scale(1);
+}
+
 /* 加载文字 —— 居中、香槟暖白、小号 */
 .loader-text {
   font-family: var(--font-display);
