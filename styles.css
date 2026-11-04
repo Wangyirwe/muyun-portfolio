@@ -564,6 +564,15 @@ body.loader-active {
   padding: 16px var(--gutter);
 }
 
+/* 夜间模式（Android Force Dark）：系统会把上面这层浅色反相成深色，
+   但 .38 太透，看起来只是一片「黑透明」。
+   这里提高不透明度到 .82 并加强模糊，反相后就是一块实一点的黑色磨砂玻璃 */
+html.android-force-dark .nav.scrolled {
+  background: rgba(236, 233, 227, .82);
+  backdrop-filter: blur(24px) saturate(1.15);
+  -webkit-backdrop-filter: blur(24px) saturate(1.15);
+}
+
 /* modal 打开时锁定导航栏，禁止任何过渡动画 */
 body.has-modal .nav {
   transition: none !important;

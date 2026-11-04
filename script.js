@@ -16,11 +16,18 @@ if (_isTouchDevice) document.documentElement.classList.add('touch-device');
    解法：给 <html> 加 android-force-dark class，CSS 里跳过我们的 filter:invert(1)，
    让 Force Dark 的反相直接生效（白线黑底 → screen 混合正确）。
    Edge Android 不用 Force Dark（有自己的暗主题），排除掉！ */
-const _isAndroidForceDark =
+const _isAndroidUA =
   /Android/i.test(navigator.userAgent) &&
-  !/EdgA/i.test(navigator.userAgent) &&  // Edge Android 不走 Force Dark
-  window.matchMedia('(prefers-color-scheme: dark)').matches;
-if (_isAndroidForceDark) document.documentElement.classList.add('android-force-dark');
+  !/EdgA/i.test(navigator.userAgent);  // Edge Android 不走 Force Dark
+const _darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+
+// 系统夜间模式可能在页面打开后才被切换，这里跟随变化实时同步 class
+const _syncForceDarkClass = () => {
+  document.documentElement.classList.toggle('android-force-dark', _isAndroidUA && _darkMq.matches);
+};
+_syncForceDarkClass();
+if (_darkMq.addEventListener) _darkMq.addEventListener('change', _syncForceDarkClass);
+else if (_darkMq.addListener) _darkMq.addListener(_syncForceDarkClass);
 
 /* ---------- 触屏：长按后清掉粘住的 :hover 状态（iOS Safari 经典 bug） ---------- */
 document.addEventListener('touchend', function() {
