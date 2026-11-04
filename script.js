@@ -1435,25 +1435,34 @@ function initWorkModal() {
   };
 
   // 触屏：点一下给约 280ms 的「亮起」反馈，视觉等同电脑端 hover 的白底效果
+  // 用行内 !important 直接写入样式，不依赖 CSS 类，避免样式表缓存/优先级问题
   const flashTap = (btn) => {
     if (!document.documentElement.classList.contains('touch-device')) return;
-    if (btn.classList.contains('is-tap')) return; // pointerdown 已触发过，避免重复延长
     btn.classList.add('is-tap');
+    btn.style.setProperty('background', '#fff', 'important');
+    btn.style.setProperty('color', '#1a1a1e', 'important');
+    btn.style.setProperty('border-color', '#fff', 'important');
+    btn.style.setProperty('transform', 'translateY(-50%) scale(1.06)', 'important');
     clearTimeout(btn._tapTimer);
-    btn._tapTimer = setTimeout(() => btn.classList.remove('is-tap'), 280);
+    btn._tapTimer = setTimeout(() => {
+      btn.classList.remove('is-tap');
+      ['background', 'color', 'border-color', 'transform'].forEach((p) => btn.style.removeProperty(p));
+    }, 280);
   };
 
-  navPrev.addEventListener('pointerdown', () => flashTap(navPrev));
-  navNext.addEventListener('pointerdown', () => flashTap(navNext));
+  // 触屏用 touchstart 触发（与缩放条按钮一致的写法），同时阻止冒泡到 media 拖动逻辑；
+  // 桌面仍走 hover，click 只负责翻页
+  [navPrev, navNext].forEach((btn) => {
+    btn.addEventListener('touchstart', () => flashTap(btn), { passive: true });
+    btn.addEventListener('pointerdown', () => flashTap(btn));
+  });
   navPrev.addEventListener('click', () => {
-    flashTap(navPrev);
     if (modalImages.length < 2) return;
     modalIdx = (modalIdx - 1 + modalImages.length) % modalImages.length;
     showImage(modalImages[modalIdx]);
     updateNav();
   });
   navNext.addEventListener('click', () => {
-    flashTap(navNext);
     if (modalImages.length < 2) return;
     modalIdx = (modalIdx + 1) % modalImages.length;
     showImage(modalImages[modalIdx]);
