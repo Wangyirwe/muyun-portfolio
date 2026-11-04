@@ -3988,3 +3988,32 @@ body.filter-graphic    .xiaohei-cat {
     transition: transform .12s ease-out;
   }
 }
+
+/* ============================================
+   触屏：作品弹窗「上一张 / 下一张」按钮
+   --------------------------------------------
+   触屏浏览器把最后一次点击的元素保留在 :hover / :focus 里，
+   翻页按钮会一直停在白色高亮上。这里强制：
+   常态 = 半透明胶囊；只有手指按住(:active)的瞬间白闪，松手立即复原。
+   放在文件末尾 + 高优先级，覆盖前面所有 hover/focus 规则。
+   ============================================ */
+html.touch-device .work-modal-nav,
+html.touch-device .work-modal-media .work-modal-nav,
+html.touch-device .work-modal-media:hover .work-modal-nav,
+html.touch-device .work-modal-nav:hover,
+html.touch-device .work-modal-nav:focus,
+html.touch-device .work-modal-nav:focus-visible {
+  opacity: 1 !important;
+  background: rgba(26, 26, 30, .72) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+  transform: translateY(-50%) !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.touch-device .work-modal-nav:active {
+  background: #fff !important;
+  color: #1a1a1e !important;
+  transform: translateY(-50%) scale(.94) !important;
+}
