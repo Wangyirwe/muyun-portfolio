@@ -958,7 +958,6 @@ section.contact { scroll-margin-top: 96px;
   transition: none;
 }
 
-section.hero    { z-index: 0; }
 section.works   { scroll-margin-top: 96px; z-index: 1; }
 section.about   { scroll-margin-top: 96px; z-index: 2; padding-bottom: 220px; }
 section.contact { z-index: 3; }
@@ -986,7 +985,8 @@ section.works {
 section.works::before {
   content: '';
   position: absolute;
-  inset: -20%;
+  /* 顶部不外溢，避免压在首屏之上（首屏已降到 works 之下） */
+  inset: 0 -20% -20% -20%;
   background:
     radial-gradient(ellipse 50% 60% at 20% 30%, rgba(250,225,230,0.9), transparent 55%),
     radial-gradient(ellipse 50% 50% at 75% 15%, rgba(214,228,250,0.7), transparent 50%),
@@ -1001,7 +1001,7 @@ section.works::before {
 section.works::after {
   content: '';
   position: absolute;
-  inset: -20%;
+  inset: 0 -20% -20% -20%;
   background:
     radial-gradient(ellipse 40% 45% at 50% 65%, rgba(233,226,250,0.7), transparent 45%),
     radial-gradient(ellipse 40% 35% at 15% 40%, rgba(246,220,226,0.6), transparent 40%),
@@ -1013,10 +1013,10 @@ section.works::after {
   z-index: 0;
 }
 
-/* Hero 在 works 之上，挡住 works 渐变背景的向上溢出 */
+/* Hero 参与堆叠：层级必须低于 works，下一屏才能压上来 */
 section.hero {
   position: relative;
-  z-index: 2;
+  z-index: 0;
 }
 
 section.works > * {

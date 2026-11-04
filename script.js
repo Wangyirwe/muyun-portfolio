@@ -1784,8 +1784,9 @@ function initCardStack() {
     });
   };
 
-  // 缓存 About 背景值，避免每帧重绘（backdropFilter 非常贵）
+  // 缓存 About / Works 背景值，避免每帧重绘（backdropFilter 非常贵）
   let _aboutBgKey = '';
+  let _worksBgKey = '';
 
   const update = () => {
     const vh = window.innerHeight;
@@ -1845,9 +1846,38 @@ spacerH = 0;
       if (sec._spacer) sec._spacer.style.height = spacerH + 'px';
     }
 
-    // About 背景渐变：半透模糊 → 实色，随 Works 被盖住的进度平滑过渡
     const works = document.querySelector('section.works');
     const about = document.querySelector('section.about');
+
+    // Works 背景渐变：半透模糊 → 实色，随 Hero 被盖住的进度平滑过渡
+    // （Works 本身透明，不处理的话首屏内容会从下面透出来）
+    const hero = document.querySelector('section.hero');
+    if (hero && works && hero._top !== undefined && works._top !== undefined) {
+      const hBottom = hero._top + hero._height;
+      const hStart = Math.max(hero._top, hBottom - vh);
+      const hEnd = works._top;
+
+      let hProgress;
+      if (scrollY <= hStart) {
+        hProgress = 0;
+      } else if (scrollY >= hEnd) {
+        hProgress = 1;
+      } else {
+        hProgress = (scrollY - hStart) / Math.max(1, hEnd - hStart);
+      }
+
+      const hBlur = Math.round(28 * (1 - hProgress) * 10) / 10;
+      const hAlpha = Math.round((0.78 + 0.22 * hProgress) * 1000) / 1000;
+      const hKey = hBlur + '|' + hAlpha;
+      if (hKey !== _worksBgKey) {
+        _worksBgKey = hKey;
+        works.style.background = `rgba(236, 233, 227, ${hAlpha})`;
+        works.style.backdropFilter = `blur(${hBlur}px)`;
+        works.style.webkitBackdropFilter = `blur(${hBlur}px)`;
+      }
+    }
+
+    // About 背景渐变：半透模糊 → 实色，随 Works 被盖住的进度平滑过渡
     if (works && about && works._top !== undefined && about._top !== undefined) {
       const wTop = works._top;
       const wBottom = wTop + works._height;
