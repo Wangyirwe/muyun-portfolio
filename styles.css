@@ -229,9 +229,8 @@ body.loader-active {
     rgba(244, 233, 212, .20) 0%,
     rgba(201, 185, 154, .09) 38%,
     transparent 68%);
-  filter: blur(8px);
   pointer-events: none;
-  animation: loaderHalo 4.2s ease-in-out infinite;
+  animation: loaderHalo 3.4s ease-in-out infinite;
 }
 
 @keyframes loaderHalo {
@@ -257,7 +256,7 @@ body.loader-active {
   border-radius: 50%;
   background: var(--ink-champagne);
   opacity: 0;
-  animation: loaderShape 4.2s cubic-bezier(.5, .05, .4, 1) infinite;
+  animation: loaderShape 3.4s cubic-bezier(.5, .05, .4, 1) infinite;
 }
 
 .loader-shapes i:nth-child(1) { --r: 96px;  --a: 12deg;  animation-delay: .00s; }
@@ -281,25 +280,26 @@ body.loader-active {
 }
 
 @keyframes loaderShape {
-  0%, 54% {
+  /* 字母在的时候隐身，字母散尽后才登场，填满空场 */
+  0%, 64% {
     opacity: 0;
     transform: translate(-50%, -50%) rotate(var(--a)) translateX(var(--r)) scale(.2);
   }
-  64% {
-    opacity: .85;
-    transform: translate(-50%, -50%) rotate(calc(var(--a) + 55deg)) translateX(var(--r)) scale(1);
+  72% {
+    opacity: .8;
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 50deg)) translateX(var(--r)) scale(1);
   }
-  74% {
+  82% {
     opacity: 1;
-    transform: translate(-50%, -50%) rotate(calc(var(--a) + 130deg)) translateX(calc(var(--r) * 1.3)) scale(1.12);
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 120deg)) translateX(calc(var(--r) * 1.3)) scale(1.12);
   }
-  88% {
-    opacity: .7;
-    transform: translate(-50%, -50%) rotate(calc(var(--a) + 205deg)) translateX(var(--r)) scale(.85);
+  94% {
+    opacity: .55;
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 200deg)) translateX(var(--r)) scale(.8);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) rotate(calc(var(--a) + 260deg)) translateX(var(--r)) scale(.2);
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 250deg)) translateX(var(--r)) scale(.2);
   }
 }
 
@@ -323,6 +323,7 @@ body.loader-active {
 .loader-logo span {
   display: inline-block;
   --dx: 0em;
+  --dy: 0em;
   --rot: 0deg;
   transform-origin: 50% 78%;
   backface-visibility: hidden;
@@ -338,16 +339,16 @@ body.loader-active {
   color: transparent;
   -webkit-text-fill-color: transparent;
   animation:
-    loaderKinetic 4.2s cubic-bezier(.62, .02, .34, 1) infinite,
+    loaderKinetic 3.4s cubic-bezier(.62, .02, .34, 1) infinite,
     loaderShine 2.1s linear infinite;
 }
 
-/* 每个字母：错开 75ms；并赋予各自飞散方向（中间字母居中，两侧向外） */
-.loader-logo span:nth-child(1) { animation-delay: 0s;    --dx: -1.35em; --rot: -18deg; }
-.loader-logo span:nth-child(2) { animation-delay: .075s; --dx: -.62em; --rot: -8deg;  }
-.loader-logo span:nth-child(3) { animation-delay: .15s;  --dx: 0em;    --rot: 0deg;   }
-.loader-logo span:nth-child(4) { animation-delay: .225s; --dx: .62em;  --rot: 8deg;   }
-.loader-logo span:nth-child(5) { animation-delay: .30s;  --dx: 1.35em;  --rot: 18deg;  }
+/* 每个字母：错开 75ms；--dx/--dy 决定飞入与四散的方向（中间向上，两侧斜向上下） */
+.loader-logo span:nth-child(1) { animation-delay: 0s;    --dx: -1.35em; --dy: -.65em; --rot: -18deg; }
+.loader-logo span:nth-child(2) { animation-delay: .075s; --dx: -.62em;  --dy: .6em;   --rot: -8deg;  }
+.loader-logo span:nth-child(3) { animation-delay: .15s;  --dx: 0em;     --dy: -1em;   --rot: 0deg;   }
+.loader-logo span:nth-child(4) { animation-delay: .225s; --dx: .62em;   --dy: .6em;   --rot: 8deg;   }
+.loader-logo span:nth-child(5) { animation-delay: .30s;  --dx: 1.35em;  --dy: -.65em; --rot: 18deg;  }
 
 /* 流光扫过：与主时间轴独立，2.1s 一次（4.2s 内扫两遍） */
 @keyframes loaderShine {
@@ -363,54 +364,57 @@ body.loader-active {
     transform: translate3d(var(--dx), .5em, 0) scale(.3) rotate(var(--rot)) rotateY(-70deg);
   }
   /* 帧 1：向中心飞入并轻微过冲 */
-  8% {
+  9% {
     opacity: 1;
     transform: translate3d(0, -.05em, 0) scale(1.15) rotate(0deg) rotateY(0deg);
   }
   /* 帧 2：落位成字 */
-  16% {
+  18% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
   }
   /* 帧 3：轻微呼吸 */
-  24% {
+  26% {
     opacity: 1;
-    transform: translate3d(0, -.09em, 0) scale(1.03) rotate(0deg) rotateY(0deg);
+    transform: translate3d(0, -.07em, 0) scale(1.02) rotate(0deg) rotateY(0deg);
   }
-  /* 帧 4：3D 翻面波 */
-  33% {
-    opacity: 1;
-    transform: translate3d(0, 0, 24px) scale(1.05) rotate(0deg) rotateY(-26deg);
-  }
-  41% {
+  /* 帧 4：回正（加载结束会定格在这一帧，避免生硬跳变） */
+  34% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
   }
-  /* 帧 5：横向拉伸 → 纵向压扁蓄力 */
+  /* 帧 5：3D 翻面波 */
+  42% {
+    opacity: 1;
+    transform: translate3d(0, 0, 24px) scale(1.05) rotate(0deg) rotateY(-26deg);
+  }
   48% {
     opacity: 1;
-    transform: translate3d(0, .07em, 0) scaleY(.68) scaleX(1.22) rotate(0deg) rotateY(0deg);
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
   }
-  /* 帧 6：朝各自方向弹射飞散 */
-  58% {
+  /* 帧 6：横向拉伸 → 纵向压扁蓄力 */
+  55% {
     opacity: 1;
-    transform: translate3d(calc(var(--dx) * .8), -.5em, 0) scale(.62) rotate(var(--rot)) rotateY(45deg);
+    transform: translate3d(0, .05em, 0) scaleY(.7) scaleX(1.2) rotate(0deg) rotateY(0deg);
   }
-  70% {
-    opacity: .55;
-    transform: translate3d(var(--dx), -.1em, 0) scale(.34) rotate(calc(var(--rot) * 1.2)) rotateY(30deg);
+  /* 帧 7：四散飞走 —— 每个字母朝自己的方向炸开，快速淡出（不再整排向下坠） */
+  64% {
+    opacity: .95;
+    transform: translate3d(calc(var(--dx) * .45), calc(var(--dy) * .45), 0)
+               scale(.72) rotate(calc(var(--rot) * .7)) rotateY(0deg);
   }
-  /* 帧 7：散尽 —— 字母消失，只留几何粒子 */
-  80% {
-    opacity: .12;
-    transform: translate3d(var(--dx), .75em, 0) scale(.16) rotate(calc(var(--rot) * 1.6)) rotateY(10deg);
+  74% {
+    opacity: .35;
+    transform: translate3d(calc(var(--dx) * 1.15), calc(var(--dy) * 1.15), 0)
+               scale(.28) rotate(calc(var(--rot) * 1.4)) rotateY(35deg);
   }
-  86% {
+  82% {
     opacity: 0;
-    transform: translate3d(var(--dx), .9em, 0) scale(.1) rotate(calc(var(--rot) * 1.6)) rotateY(0deg);
+    transform: translate3d(calc(var(--dx) * 1.45), calc(var(--dy) * 1.45), 0)
+               scale(.08) rotate(calc(var(--rot) * 1.8)) rotateY(50deg);
   }
   /* 帧 8：隐身到本轮结束，下一次出现交给循环重启后的帧 1
-     —— 这样「消失后只出现一次」，不会连出两遍 */
+     —— 与页面刚打开时的飞入完全同一套关键帧 */
   100% {
     opacity: 0;
     transform: translate3d(var(--dx), .5em, 0) scale(.3) rotate(var(--rot)) rotateY(-70deg);
