@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#16110c">
   <!-- 内联预置样式：防 FOUC + 确保 loader 最先出现 -->
   <style>html.fonts-ready{visibility:visible}body.loader-active{position:fixed;inset:0;overflow-y:scroll}</style>
-  <link rel="stylesheet" href="styles.css?v=noisefix">
+  <link rel="stylesheet" href="styles.css?v=loaderlogo">
   <!-- 噪点滤镜 SVG 定义 -->
   </head><body class="hero-in filter-illustration"><svg class="noise-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
     <filter id="noiseFilter">
@@ -27,7 +27,9 @@
   <!-- ============ 加载动画 ============ -->
   <div class="loader" id="loader">
     <div class="loader-inner">
-      <div class="loader-symbol"></div>
+      <div class="loader-logo" aria-label="MUYUN">
+        <span>M</span><span>U</span><span>Y</span><span>U</span><span>N</span>
+      </div>
       <div class="loader-text">页面加载中<span class="loader-dots"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
     </div>
     <div class="loader-meta">
@@ -440,7 +442,7 @@
   <!-- ?v 参数用于强刷缓存：script.js 改动后旧版本会被浏览器缓存，
        导航落点无缝对齐等修复不生效，必须换 URL 强制重新拉取 -->
   <script src="assets/dither/Dither.js"></script>
-  <script src="script.js?v=parallaxfix"></script>
+  <script src="script.js?v=bgfix"></script>
 
 
 

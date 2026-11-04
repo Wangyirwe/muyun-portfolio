@@ -11,6 +11,17 @@ const _isTouchDevice = (
 );
 if (_isTouchDevice) document.documentElement.classList.add('touch-device');
 
+/* ---------- Android Force Dark 检测 ---------- */
+/* Chrome Android 无视 color-scheme: light，强行反相 background-image 和 <img>。
+   解法：给 <html> 加 android-force-dark class，CSS 里跳过我们的 filter:invert(1)，
+   让 Force Dark 的反相直接生效（白线黑底 → screen 混合正确）。
+   Edge Android 不用 Force Dark（有自己的暗主题），排除掉！ */
+const _isAndroidForceDark =
+  /Android/i.test(navigator.userAgent) &&
+  !/EdgA/i.test(navigator.userAgent) &&  // Edge Android 不走 Force Dark
+  window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (_isAndroidForceDark) document.documentElement.classList.add('android-force-dark');
+
 /* ---------- 触屏：长按后清掉粘住的 :hover 状态（iOS Safari 经典 bug） ---------- */
 document.addEventListener('touchend', function() {
   // 触发一次重绘，强制浏览器清除 hover 高亮
