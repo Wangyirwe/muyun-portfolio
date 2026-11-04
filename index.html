@@ -3,10 +3,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>沐匀 MUYUN — Portfolio</title>
-  <link rel="icon" href="assets/icons/favicon.png" type="image/png">
+  <link rel="icon" href="assets/icons/favicon.png?v=3" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=3">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#16110c">
   <!-- 内联预置样式：防 FOUC + 确保 loader 最先出现 -->
   <style>html.fonts-ready{visibility:visible}body.loader-active{position:fixed;inset:0;overflow-y:scroll}</style>
-  <link rel="stylesheet" href="styles.css?v=fixreset1">
+  <link rel="stylesheet" href="styles.css?v=noisefix">
   <!-- 噪点滤镜 SVG 定义 -->
   </head><body class="hero-in filter-illustration"><svg class="noise-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
     <filter id="noiseFilter">
@@ -267,9 +270,9 @@
           <span class="tools-title">Tools · 副技能</span>
         </div>
         <div class="tools-list">
-          <span class="tool-tag sai2-tag" data-skill="Sai2" data-level="熟练 · 3年" data-desc="日式插画、线稿绘制、赛璐璐上色，自定义笔刷系统。"><img class="tool-icon" src="assets/icons/sai2.png" alt="">Sai2</span>
-          <span class="tool-tag" data-skill="Blender" data-level="入门 · 1年+" data-desc="3D 建模、场景搭建、基础渲染，用于包装立体效果图展示。"><img class="tool-icon" src="assets/icons/blender.png" alt="">Blender</span>
-          <span class="tool-tag dn-tag" data-skill="Dimension" data-level="熟练 · 2年" data-desc="产品 3D 贴图、包装样机、场景合成，与 Photoshop 联动出图。"><img class="tool-icon" src="assets/icons/dn.ico" alt="">Dimension</span>
+          <span class="tool-tag sai2-tag" data-skill="Sai2" data-level="熟练 · 3年" data-desc="日式插画、线稿绘制、赛璐璐上色，自定义笔刷系统。"><img class="tool-icon" src="assets/icons/sai2.png?v=2" alt="">Sai2</span>
+          <span class="tool-tag" data-skill="Blender" data-level="入门 · 1年+" data-desc="3D 建模、场景搭建、基础渲染，用于包装立体效果图展示。"><img class="tool-icon" src="assets/icons/blender.png?v=2" alt="">Blender</span>
+          <span class="tool-tag dn-tag" data-skill="Dimension" data-level="熟练 · 2年" data-desc="产品 3D 贴图、包装样机、场景合成，与 Photoshop 联动出图。"><img class="tool-icon" src="assets/icons/dn.png" alt="">Dimension</span>
         </div>
       </div>
     </div>
@@ -437,7 +440,7 @@
   <!-- ?v 参数用于强刷缓存：script.js 改动后旧版本会被浏览器缓存，
        导航落点无缝对齐等修复不生效，必须换 URL 强制重新拉取 -->
   <script src="assets/dither/Dither.js"></script>
-  <script src="script.js?v=draghit1"></script>
+  <script src="script.js?v=parallaxfix"></script>
 
 
 

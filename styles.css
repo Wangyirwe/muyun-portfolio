@@ -27,6 +27,10 @@
 
 /* ---------- CSS Variables —— DARK THEME ---------- */
 :root {
+  /* 告知浏览器：本站为浅色设计，禁止自动深色模式强行反转（Android force-dark / Safari auto-dark） */
+  color-scheme: light;
+  forced-color-adjust: none;
+
   /* 背景 —— 分层：页眉深灰 + 主体浅灰 */
   --bg-dark: #1a1a1e;      /* Hero / Nav 深灰 */
   --bg-light: #ece9e3;     /* Works / About / Contact 浅灰（参考站 ivory 调暗点，避免太亮） */
@@ -60,6 +64,9 @@ html, body {
   max-width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  /* 让 absolute 的 noise-overlay 有完整的高度参考 */
+  position: relative;
+  min-height: 100vh;
   /* 强制经典滚动条（Edge/Chrome overlay scrollbar 默认自动隐藏） */
   scrollbar-width: thin;
   scrollbar-color: #a8a8a8 transparent;
@@ -126,9 +133,12 @@ button { background: none; border: none; cursor: pointer; font: inherit; color: 
 }
 
 /* ---------- 动态前景杂色层（canvas 逐像素生成）---------- */
+/* 用 absolute 而不是 fixed：fixed 会被手机浏览器地址栏/搜索框收起时的 viewport 变化搞出底部白边 */
 .noise-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 9999;
   opacity: 0.28;
@@ -154,6 +164,8 @@ body.loader-active {
   inset: 0;
   z-index: 100000;
   background: var(--bg-dark);
+  color-scheme: light;
+  forced-color-adjust: none;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1147,7 +1159,7 @@ section.works > * {
   border: none;
   border-radius: 14px;
   aspect-ratio: 1/1;
-  background: linear-gradient(135deg, #a8e6a3 0%, #7bc87f 100%);
+  background: #fff;
   position: relative;
   overflow: hidden;
 }
@@ -2603,11 +2615,14 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 }
 
 /* ============ 触屏端 ============ */
-@media (hover: none) and (pointer: coarse) {
+/* 三种兜底匹配：严格触屏、有触控但 fine pointer、JS 加的 touch-device class */
+@media (hover: none) and (pointer: coarse),
+       (any-hover: none) and (any-pointer: coarse),
+       (any-hover: none) and (any-pointer: fine) {
   .work-modal-counter { opacity: 1 !important; }
   .work-modal-zoom-bar { opacity: 1 !important; }
   .work-modal-zoom-bar .zoom-bar-hint.hint-desk { display: none; }
-  .work-modal-zoom-bar .zoom-bar-hint.hint-touch { display: none; }
+  .work-modal-zoom-bar .zoom-bar-hint.hint-touch { display: inline; }
 
   /* zoom-bar 内按钮：hover/focus 强制回原样，:active 瞬间亮一下就消失 */
   .work-modal-zoom-bar button,
@@ -2625,6 +2640,45 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
     background: rgba(255,255,255,.1) !important;
     transition: none !important;
   }
+}
+/* JS 兜底：maxTouchPoints 检测到的触屏设备 */
+html.touch-device .work-modal-counter { opacity: 1 !important; }
+html.touch-device .work-modal-zoom-bar { opacity: 1 !important; }
+html.touch-device .work-modal-zoom-bar .zoom-bar-hint.hint-desk { display: none; }
+html.touch-device .work-modal-zoom-bar .zoom-bar-hint.hint-touch { display: inline; }
+html.touch-device .work-modal-zoom-bar button:active {
+  color: #fff !important;
+  transform: scale(0.92) !important;
+  background: rgba(255,255,255,.1) !important;
+  transition: none !important;
+}
+
+/* === 触屏：禁用所有鼠标 hover 相关的 transform / parallax === */
+/* about-photo 禁用 hover 缩放偏移 */
+html.touch-device .about-photo::before,
+html.touch-device .about-photo:hover::before {
+  transform: translate3d(0, 0, 0) scale(1.55) !important;
+  transition: none !important;
+}
+/* work-card 禁用 parallax 偏移变量 */
+html.touch-device .work-placeholder,
+html.touch-device .work-placeholder > * {
+  --ph-tx: 0px !important;
+  --ph-ty: 0px !important;
+  transition: none !important;
+}
+/* work-card:hover::before 禁用 hover 提示 transform */
+html.touch-device .work-card:hover::before {
+  transform: translateY(-6px) !important;
+}
+/* 弹窗翻页按钮禁用 hover 效果 */
+html.touch-device .work-modal-nav:hover {
+  background: transparent !important;
+  color: inherit !important;
+  transform: translateY(-50%) !important;
+}
+html.touch-device .work-modal-media:hover .work-modal-nav {
+  opacity: 0 !important;
 }
 .work-modal-info {
   flex: 1;
@@ -3670,7 +3724,9 @@ body.filter-graphic    .xiaohei-cat {
 
 /* 触屏设备：切换操作提示 */
 .hint-touch { display: none; }
-@media (hover: none) and (pointer: coarse) {
+@media (hover: none) and (pointer: coarse),
+       (any-hover: none) and (any-pointer: coarse),
+       (any-hover: none) and (any-pointer: fine) {
   .hint-desk { display: none; }
   .hint-touch { display: inline; }
 

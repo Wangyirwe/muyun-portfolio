@@ -2,6 +2,15 @@
    MUYUN Portfolio — Scripts
    ======================================== */
 
+/* ---------- 统一触屏检测（覆盖有 stylus 的安卓机等奇葩情况） ---------- */
+/* 三种条件任意满足就算触屏：maxTouchPoints、any-hover:none、any-pointer:coarse */
+const _isTouchDevice = (
+  (navigator.maxTouchPoints || 0) > 0 ||
+  window.matchMedia('(any-hover: none)').matches ||
+  window.matchMedia('(any-pointer: coarse)').matches
+);
+if (_isTouchDevice) document.documentElement.classList.add('touch-device');
+
 /* ---------- 触屏：长按后清掉粘住的 :hover 状态（iOS Safari 经典 bug） ---------- */
 document.addEventListener('touchend', function() {
   // 触发一次重绘，强制浏览器清除 hover 高亮
@@ -415,7 +424,7 @@ empty.style.height = silentPh.offsetHeight + 'px';
 let _parallaxCleanups = [];
 function initCardParallax() {
   // 触屏设备不需要鼠标 parallax
-  if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+  if (_isTouchDevice) return;
 
   // 清理上一次的事件监听
   _parallaxCleanups.forEach(fn => fn());
@@ -447,6 +456,9 @@ function initCardParallax() {
 
 /* ---------- About 照片 hover 鼠标跟随偏移 ---------- */
 function initAboutPhotoParallax() {
+  // 触屏设备不需要鼠标 parallax
+  if (_isTouchDevice) return;
+
   const photo = document.querySelector('.about-photo');
   if (!photo) return;
   let pending = false;
@@ -1205,7 +1217,7 @@ function initWorkModal() {
   let containBasePercent = 100;
 
   // 触屏缩放控件引用（提前声明供 resetTransform 使用）
-  const $isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const $isTouch = _isTouchDevice;
   const zoomSlider = document.getElementById('workModalZoomSlider');
   const zoomBar = document.getElementById('workModalZoomBar');
 
