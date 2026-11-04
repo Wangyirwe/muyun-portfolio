@@ -1744,9 +1744,8 @@ function initAboutDivider() {
    下一张顶边到达 top:0 时该 section 释放 fixed 回到文档流，由下一张接管。
 */
 function initCardStack() {
-  // 只在 works / about / contact 三个内容页之间堆叠
-  // 页眉 hero 和页脚 footer 保持平铺，不参与堆叠
-  const sections = document.querySelectorAll('section.works, section.about, section.contact');
+  // hero / works / about / contact 依次堆叠：下一张从下方滑上来盖住上一张
+  const sections = document.querySelectorAll('section.hero, section.works, section.about, section.contact');
   if (!sections.length) return;
 
   const sectionsArr = Array.from(sections);
@@ -1829,7 +1828,8 @@ sec.style.top = sec._pinTop + 'px';
 sec.style.left = '0';
 sec.style.width = '100%';
 sec.style.transform = '';
-sec.style.filter = `brightness(${brightness})`;
+// hero 上有大量动画元素，不加 brightness 滤层，避免手机上多一层全屏合成
+sec.style.filter = sec.classList.contains('hero') ? '' : `brightness(${brightness})`;
 spacerH = secHeight;
       } else {
 sec.style.position = '';

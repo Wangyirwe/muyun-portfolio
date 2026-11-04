@@ -949,7 +949,8 @@ section {
 }
 
 /* ---------- 卡片堆叠效果（JS pin + cover）---------- */
-/* 只在 works / about / contact 之间堆叠；hero 和 footer 保持平铺 */
+/* hero / works / about / contact 依次堆叠：下一张从下方滑上来盖住上一张 */
+section.hero,
 section.works,
 section.about,
 section.contact { scroll-margin-top: 96px;
@@ -957,6 +958,7 @@ section.contact { scroll-margin-top: 96px;
   transition: none;
 }
 
+section.hero    { z-index: 0; }
 section.works   { scroll-margin-top: 96px; z-index: 1; }
 section.about   { scroll-margin-top: 96px; z-index: 2; padding-bottom: 220px; }
 section.contact { z-index: 3; }
