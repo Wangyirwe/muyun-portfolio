@@ -1437,11 +1437,14 @@ function initWorkModal() {
   // 触屏：点一下给约 280ms 的「亮起」反馈，视觉等同电脑端 hover 的白底效果
   const flashTap = (btn) => {
     if (!document.documentElement.classList.contains('touch-device')) return;
+    if (btn.classList.contains('is-tap')) return; // pointerdown 已触发过，避免重复延长
     btn.classList.add('is-tap');
     clearTimeout(btn._tapTimer);
     btn._tapTimer = setTimeout(() => btn.classList.remove('is-tap'), 280);
   };
 
+  navPrev.addEventListener('pointerdown', () => flashTap(navPrev));
+  navNext.addEventListener('pointerdown', () => flashTap(navNext));
   navPrev.addEventListener('click', () => {
     flashTap(navPrev);
     if (modalImages.length < 2) return;
