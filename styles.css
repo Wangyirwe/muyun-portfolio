@@ -4017,3 +4017,11 @@ html.touch-device .work-modal-nav:active {
   color: #1a1a1e !important;
   transform: translateY(-50%) scale(.94) !important;
 }
+
+/* 触屏点击后亮起的短暂反馈（由 script 在 click 时挂 280ms），效果与电脑端 hover 一致 */
+html.touch-device .work-modal-nav.is-tap {
+  background: #fff !important;
+  color: #1a1a1e !important;
+  border-color: #fff !important;
+  transform: translateY(-50%) scale(1.06) !important;
+}
