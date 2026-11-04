@@ -185,7 +185,7 @@ body.loader-active {
 }
 
 /* 拉窗后，内部元素也要跟着淡出一点避免拖影感 */
-.loader.done .loader-logo,
+.loader.done .loader-stage,
 .loader.done .loader-text,
 .loader.done .loader-meta {
   opacity: 0;
@@ -210,49 +210,214 @@ body.loader-active {
      自然与深底做 screen 混合。canvas 由 z-index 在前景之上。 */
 }
 
-/* 纯 CSS 字母动画：MUYUN 波浪弹跳 */
+/* ========== 纯 CSS 动能 Logo：MUYUN 分解 / 组装 循环 ========== */
+/* 参考「几何形状动能动画」：散块飞入 → 3D 翻面波 → 压扁蓄力 → 弹射飞散 → 二次归位 */
+.loader-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 12px 8px;
+}
+
+/* 背景光晕：跟随节奏呼吸，增强“炫酷”体感 */
+.loader-halo {
+  position: absolute;
+  width: min(64vw, 460px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(244, 233, 212, .20) 0%,
+    rgba(201, 185, 154, .09) 38%,
+    transparent 68%);
+  filter: blur(8px);
+  pointer-events: none;
+  animation: loaderHalo 4.2s ease-in-out infinite;
+}
+
+@keyframes loaderHalo {
+  0%, 100% { opacity: .30; transform: scale(.80); }
+  26%      { opacity: .85; transform: scale(1.05); }
+  52%      { opacity: .40; transform: scale(.88); }
+  76%      { opacity: .95; transform: scale(1.14); }
+}
+
+/* 散落的几何粒子：呼应参考图的圆点 / 圆环 / 胶囊 */
+.loader-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.loader-shapes i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-champagne);
+  opacity: 0;
+  animation: loaderShape 4.2s cubic-bezier(.5, .05, .4, 1) infinite;
+}
+
+.loader-shapes i:nth-child(1) { --r: 96px;  --a: 12deg;  animation-delay: .00s; }
+.loader-shapes i:nth-child(2) { --r: 128px; --a: 96deg;  animation-delay: .10s; }
+.loader-shapes i:nth-child(3) { --r: 84px;  --a: 188deg; animation-delay: .18s; }
+.loader-shapes i:nth-child(4) { --r: 112px; --a: 268deg; animation-delay: .26s; }
+.loader-shapes i:nth-child(5) { --r: 68px;  --a: 330deg; animation-delay: .34s; }
+
+/* 第 2、4 个做成空心圆环，第 3 个做成胶囊，增加形状层次 */
+.loader-shapes i:nth-child(2),
+.loader-shapes i:nth-child(4) {
+  background: transparent;
+  border: 1.5px solid rgba(244, 233, 212, .6);
+  width: 13px;
+  height: 13px;
+}
+.loader-shapes i:nth-child(3) {
+  width: 22px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+@keyframes loaderShape {
+  0%, 54% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--a)) translateX(var(--r)) scale(.2);
+  }
+  64% {
+    opacity: .85;
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 55deg)) translateX(var(--r)) scale(1);
+  }
+  74% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 130deg)) translateX(calc(var(--r) * 1.3)) scale(1.12);
+  }
+  88% {
+    opacity: .7;
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 205deg)) translateX(var(--r)) scale(.85);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(calc(var(--a) + 260deg)) translateX(var(--r)) scale(.2);
+  }
+}
+
+/* 字母本体 */
 .loader-logo {
+  position: relative;
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.08em;
+  align-items: center;
+  justify-content: center;
+  perspective: 900px;
+  perspective-origin: 50% 50%;
   font-family: var(--font-display);
-  font-size: clamp(36px, 9vw, 72px);
-  font-weight: 300;
-  letter-spacing: 0.02em;
+  font-size: clamp(38px, 9.5vw, 74px);
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: .02em;
+  transform-style: preserve-3d;
+  user-select: none;
 }
 
 .loader-logo span {
   display: inline-block;
-  color: var(--ink-champagne);
-  transform-origin: 50% 100%;
-  animation: loaderLetterWave 1.8s ease-in-out infinite;
+  --dx: 0em;
+  --rot: 0deg;
+  transform-origin: 50% 78%;
+  backface-visibility: hidden;
   will-change: transform, opacity;
+  /* 香槟色 → 亮白 → 香槟色的流光渐变，裁切到字形内 */
+  background-image: linear-gradient(100deg,
+    #b8a382 0%, #e6d7ba 16%, #ffffff 30%,
+    #f4e9d4 44%, #b8a382 60%, #f4e9d4 80%, #b8a382 100%);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation:
+    loaderKinetic 4.2s cubic-bezier(.62, .02, .34, 1) infinite,
+    loaderShine 2.1s linear infinite;
 }
 
-/* 每个字母错开，形成波浪 */
-.loader-logo span:nth-child(1) { animation-delay: 0.00s; }
-.loader-logo span:nth-child(2) { animation-delay: 0.12s; }
-.loader-logo span:nth-child(3) { animation-delay: 0.24s; }
-.loader-logo span:nth-child(4) { animation-delay: 0.36s; }
-.loader-logo span:nth-child(5) { animation-delay: 0.48s; }
+/* 每个字母：错开 75ms；并赋予各自飞散方向（中间字母居中，两侧向外） */
+.loader-logo span:nth-child(1) { animation-delay: 0s;    --dx: -1.35em; --rot: -18deg; }
+.loader-logo span:nth-child(2) { animation-delay: .075s; --dx: -.62em; --rot: -8deg;  }
+.loader-logo span:nth-child(3) { animation-delay: .15s;  --dx: 0em;    --rot: 0deg;   }
+.loader-logo span:nth-child(4) { animation-delay: .225s; --dx: .62em;  --rot: 8deg;   }
+.loader-logo span:nth-child(5) { animation-delay: .30s;  --dx: 1.35em;  --rot: 18deg;  }
 
-@keyframes loaderLetterWave {
-  0%, 100% {
-    transform: translateY(0) scaleY(1) scaleX(1);
-    opacity: 0.85;
+/* 流光扫过：与主时间轴独立，2.1s 一次（4.2s 内扫两遍） */
+@keyframes loaderShine {
+  0%   { background-position: 130% 0; }
+  100% { background-position: -60% 0; }
+}
+
+/* 主编排：首尾帧完全一致 —— 无缝循环 */
+@keyframes loaderKinetic {
+  /* 帧 0：散块在两侧（起点 = 终点） */
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--dx), .5em, 0) scale(.3) rotate(var(--rot)) rotateY(-70deg);
   }
-  25% {
-    transform: translateY(-0.22em) scaleY(1.08) scaleX(0.96);
+  /* 帧 1：向中心飞入并轻微过冲 */
+  10% {
     opacity: 1;
+    transform: translate3d(0, -.05em, 0) scale(1.15) rotate(0deg) rotateY(0deg);
   }
-  50% {
-    transform: translateY(0) scaleY(1) scaleX(1);
-    opacity: 0.9;
+  /* 帧 2：落位成字 */
+  18% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
   }
-  75% {
-    transform: translateY(0.04em) scaleY(0.95) scaleX(1.02);
-    opacity: 0.8;
+  /* 帧 3：轻微呼吸 */
+  26% {
+    opacity: 1;
+    transform: translate3d(0, -.09em, 0) scale(1.03) rotate(0deg) rotateY(0deg);
+  }
+  /* 帧 4：3D 翻面波 */
+  36% {
+    opacity: 1;
+    transform: translate3d(0, 0, 24px) scale(1.05) rotate(0deg) rotateY(-26deg);
+  }
+  44% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
+  }
+  /* 帧 5：横向拉伸 → 纵向压扁蓄力 */
+  52% {
+    opacity: 1;
+    transform: translate3d(0, .07em, 0) scaleY(.68) scaleX(1.22) rotate(0deg) rotateY(0deg);
+  }
+  /* 帧 6：朝各自方向弹射飞散 */
+  62% {
+    opacity: .9;
+    transform: translate3d(calc(var(--dx) * .8), -.5em, 0) scale(.55) rotate(var(--rot)) rotateY(45deg);
+  }
+  70% {
+    opacity: 0;
+    transform: translate3d(var(--dx), .75em, 0) scale(.12) rotate(calc(var(--rot) * 1.6)) rotateY(20deg);
+  }
+  /* 帧 7：空场（几何粒子登场） */
+  78% {
+    opacity: 0;
+    transform: translate3d(var(--dx), .95em, 0) scale(.16) rotate(var(--rot)) rotateY(0deg);
+  }
+  /* 帧 8：二次归位 */
+  88% {
+    opacity: 1;
+    transform: translate3d(0, -.04em, 0) scale(1.12) rotate(0deg) rotateY(0deg);
+  }
+  94% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg) rotateY(0deg);
+  }
+  /* 帧 9 = 帧 0，闭合循环 */
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx), .5em, 0) scale(.3) rotate(var(--rot)) rotateY(-70deg);
   }
 }
 

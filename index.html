@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#16110c">
   <!-- 内联预置样式：防 FOUC + 确保 loader 最先出现 -->
   <style>html.fonts-ready{visibility:visible}body.loader-active{position:fixed;inset:0;overflow-y:scroll}</style>
-  <link rel="stylesheet" href="styles.css?v=loaderlogo">
+  <link rel="stylesheet" href="styles.css?v=kinetic">
   <!-- 噪点滤镜 SVG 定义 -->
   </head><body class="hero-in filter-illustration"><svg class="noise-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
     <filter id="noiseFilter">
@@ -27,8 +27,14 @@
   <!-- ============ 加载动画 ============ -->
   <div class="loader" id="loader">
     <div class="loader-inner">
-      <div class="loader-logo" aria-label="MUYUN">
-        <span>M</span><span>U</span><span>Y</span><span>U</span><span>N</span>
+      <div class="loader-stage">
+        <div class="loader-halo" aria-hidden="true"></div>
+        <div class="loader-shapes" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="loader-logo" aria-label="MUYUN">
+          <span>M</span><span>U</span><span>Y</span><span>U</span><span>N</span>
+        </div>
       </div>
       <div class="loader-text">页面加载中<span class="loader-dots"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
     </div>
