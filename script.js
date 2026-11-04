@@ -1710,7 +1710,7 @@ else el.style.removeProperty('font-size');
   initReveal();
   initMobileMenu();
   initCanvasNoise();
-  initAboutDivider();
+  initSectionDividers();
   initCardStack();
   initMailModal();
   initSkillModal();
@@ -1727,14 +1727,16 @@ else el.style.removeProperty('font-size');
   }
 });
 
-/* ---------- About 顶部黑色切割线 ---------- */
-function initAboutDivider() {
-  const about = document.querySelector('section.about');
-  if (!about) return;
-  const divider = document.createElement('div');
-  divider.style.cssText = 'position:absolute;top:0;left:0;right:0;height:2px;background:#000;z-index:10;';
-  about.style.position = 'relative';
-  about.appendChild(divider);
+/* ---------- 各页面顶部黑色切割线 ---------- */
+function initSectionDividers() {
+  document.querySelectorAll('section.works, section.about').forEach((sec) => {
+    if (sec.querySelector(':scope > .section-divider')) return;
+    const divider = document.createElement('div');
+    divider.className = 'section-divider';
+    divider.style.cssText = 'position:absolute;top:0;left:0;right:0;height:2px;background:#000;z-index:10;';
+    sec.style.position = 'relative';
+    sec.appendChild(divider);
+  });
 }
 
 /* ---------- 卡片堆叠滚动效果（pin + cover）----------
