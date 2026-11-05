@@ -962,6 +962,7 @@ section.about   { padding-bottom: 220px; position: relative; overflow: hidden; b
 section.about::before {
   content: ''; position: absolute; inset: 0;
   background: url('assets/about-bg.png') center/cover no-repeat;
+  opacity: 0.25;
   pointer-events: none; z-index: 0;
 }
 section.about > * { position: relative; z-index: 1; }
