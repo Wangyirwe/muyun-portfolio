@@ -1,5 +1,6 @@
 # 输出
 个人风格网站.zip
+*.zip
 *.log
 .DS_Store
 Thumbs.db

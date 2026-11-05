@@ -1,4 +1,4 @@
-/* ========================================
+﻿/* ========================================
    MUYUN Portfolio — Scripts
    ======================================== */
 
@@ -36,7 +36,7 @@ document.addEventListener('touchend', function() {
   document.body.classList.remove('touch-hover');
 }, true);
 
-/* ---------- Hero 底部 Scroll 按钮 — 平滑滚动 ---------- */
+/* ---------- Hero 底部 Scroll 按钮 — 平滑滚动（与导航栏同逻辑） ---------- */
 document.addEventListener('DOMContentLoaded', function() {
   var h = document.querySelector('.scroll-hint');
   if (!h) return;
@@ -44,10 +44,28 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
     var t = document.querySelector('#works, section.works');
     if (!t) return;
+    // 与 smoothScroll 完全一致的导航栏高度计算（考虑 scrolled 状态切换）
     var nav = document.querySelector('.nav');
-    var nh = nav ? nav.getBoundingClientRect().height : 60;
-    var top = t.getBoundingClientRect().top + window.scrollY - nh;
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    var flowTop = t.getBoundingClientRect().top + window.scrollY;
+    var navH;
+    if (nav) {
+      var wasScrolled = nav.classList.contains('scrolled');
+      var willBeScrolled = (flowTop - nav.offsetHeight) > 60;
+      if (willBeScrolled !== wasScrolled) {
+        var prevT = nav.style.transition;
+        nav.style.transition = 'none';
+        nav.classList.toggle('scrolled', willBeScrolled);
+        navH = nav.getBoundingClientRect().height;
+        nav.classList.toggle('scrolled', wasScrolled);
+        nav.style.transition = prevT;
+      } else {
+        navH = nav.getBoundingClientRect().height;
+      }
+    } else {
+      navH = 60;
+    }
+    var toY = Math.max(0, flowTop - navH);
+    window.scrollTo({ top: toY, behavior: 'smooth' });
   });
 });
 
@@ -869,7 +887,6 @@ if (filter === 'illustration') {
      // 重新绑定 reveal observer —— innerHTML 替换了 DOM，旧 observer 已失效
      requestAnimationFrame(() => {
        initReveal();
-       if (window.__restack) window.__restack();
      });
   });
 }
@@ -1003,16 +1020,8 @@ function initMobileMenu() {
       if (rafId) cancelAnimationFrame(rafId);
       fromY = window.scrollY;
       landTarget = target;
-      // 点击时重新测量堆叠缓存：图片/字体加载会改变 section 高度，旧缓存会让落点漂移
-      // （restack 内部瞬时释放全部 pin 再复原，同步完成，无视觉闪烁）
-      if (window.__restack) window.__restack();
-      // 用缓存的真实文档流偏移（被钉住的 section 的 rect 是屏幕位置，不可用）
-      let flowTop;
-      if (typeof target._top === 'number' && isFinite(target._top) && target._top > 0) {
-flowTop = target._top;
-      } else {
-flowTop = target.getBoundingClientRect().top + window.scrollY;
-      }
+      // 直接用文档流位置（不再有堆叠 pin）
+      const flowTop = target.getBoundingClientRect().top + window.scrollY;
       // 导航栏 scrolled / 非 scrolled 两种状态高度不同（padding 24↔16、边框变化），
       // 点击时量的高度 ≠ 目的地实际高度（约差 15px），必须按"落点的滚动状态"取导航高度
       const nav = document.querySelector('.nav');
@@ -1076,8 +1085,10 @@ function initMailModal() {
   closeBtn && closeBtn.addEventListener('click', close);
   // 点击遮罩关闭
   let $modalTouch = false; modal.addEventListener('touchstart', (e) => { if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) { $modalTouch = true; close(); } }); modal.addEventListener('click', (e) => { if ($modalTouch) { $modalTouch = false; return; } if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close(); });
-  // ESC 关闭
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  // ESC 关闭仅桌面端
+  if (!_isTouchDevice) {
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  }
 
   // 复制邮箱
   if (copyBtn) {
@@ -1143,7 +1154,10 @@ function initSkillModal() {
   });
   closeBtn && closeBtn.addEventListener('click', close);
   let $modalTouch = false; modal.addEventListener('touchstart', (e) => { if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) { $modalTouch = true; close(); } }); modal.addEventListener('click', (e) => { if ($modalTouch) { $modalTouch = false; return; } if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  // ESC 关闭仅桌面端
+  if (!_isTouchDevice) {
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  }
 }
 
 /* ---------- 技能行手风琴 ---------- */
@@ -1201,11 +1215,30 @@ const targetFilter = jumpBtn.dataset.jump;
 // 触发对应 filter-tab 的点击
 const tab = document.querySelector(`.filter-tab[data-filter="${targetFilter}"]`);
 if (tab) tab.click();
-// 滚动到 works 区
+// 滚动到 works 区（与 smoothScroll / scroll-hint 同逻辑）
 const worksSec = document.querySelector('section.works');
 if (worksSec) {
-  const y = worksSec.getBoundingClientRect().top + window.scrollY - 40;
-  window.scrollTo({ top: y, behavior: 'smooth' });
+  const nav = document.querySelector('.nav');
+  const flowTop = worksSec.getBoundingClientRect().top + window.scrollY;
+  let navH;
+  if (nav) {
+    const wasScrolled = nav.classList.contains('scrolled');
+    const willBeScrolled = (flowTop - nav.offsetHeight) > 60;
+    if (willBeScrolled !== wasScrolled) {
+      const prevT = nav.style.transition;
+      nav.style.transition = 'none';
+      nav.classList.toggle('scrolled', willBeScrolled);
+      navH = nav.getBoundingClientRect().height;
+      nav.classList.toggle('scrolled', wasScrolled);
+      nav.style.transition = prevT;
+    } else {
+      navH = nav.getBoundingClientRect().height;
+    }
+  } else {
+    navH = 60;
+  }
+  const toY = Math.max(0, flowTop - navH);
+  window.scrollTo({ top: toY, behavior: 'smooth' });
 }
       });
     }
@@ -1534,18 +1567,21 @@ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(card); }
   renderWorks = function() { origRender(); bindCards(); };
 
   closeBtn && closeBtn.addEventListener('click', close);
-  // backdrop 拦截所有触摸，防止穿透到下层作品卡片；点空白关闭弹窗
-  modal.addEventListener('touchstart', (e) => {
-    if (e.target === modal) { e.preventDefault(); close(); return; }
-    const dialog = modal.querySelector('[role="dialog"]');
-    if (dialog && !dialog.contains(e.target)) { e.preventDefault(); close(); return; }
-  }, { passive: false });
+  // backdrop 拦截触摸点空白关闭；不阻止默认行为，让 media 内部 touch 拖动正常工作
   let $modalTouch = false;
+  modal.addEventListener('touchstart', (e) => {
+    if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) {
+      $modalTouch = true; close();
+    }
+  });
   modal.addEventListener('click', (e) => {
     if ($modalTouch) { $modalTouch = false; return; }
     if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close();
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  // ESC 关闭仅桌面端：触屏设备没有物理键盘，点空白关闭
+  if (!_isTouchDevice) {
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  }
 }
 
 function initXiaohei() {
@@ -1711,24 +1747,28 @@ else el.style.removeProperty('font-size');
   initMobileMenu();
   initCanvasNoise();
   initSectionDividers();
-  initCardStack();
   initMailModal();
   initSkillModal();
   initSkillAccordion();
   initWorkModal();
   initAboutPhotoParallax();
-
-  // 图片和字体加载完成后 section 高度会变化（初始 measure 时它们还没就绪，
-  // 缓存偏移会比真实布局小 ~16px，导致堆叠 pin 的 spacer 撑错高度、页面漂移），
-  // 资源就绪后必须重新测量，保证缓存与真实布局一致
-  window.addEventListener('load', () => { if (window.__restack) window.__restack(); });
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => { if (window.__restack) window.__restack(); });
-  }
 });
 
 /* ---------- 各页面顶部黑色切割线 ---------- */
 function initSectionDividers() {
+  // 清除旧卡片堆叠模式残留：stack-spacer 占位 div + 动态背景 inline style
+  document.querySelectorAll('.stack-spacer').forEach(s => s.remove());
+  ['works', 'about'].forEach(cls => {
+    const sec = document.querySelector('section.' + cls);
+    if (!sec) return;
+    // 只移除旧 pin/bg 相关 inline，保留 position:relative（分割线需要）
+    sec.style.background = '';
+    sec.style.backdropFilter = '';
+    sec.style.webkitBackdropFilter = '';
+    sec.style.filter = '';
+    sec.style.opacity = '';
+  });
+
   document.querySelectorAll('section.works, section.about').forEach((sec) => {
     if (sec.querySelector(':scope > .section-divider')) return;
     const divider = document.createElement('div');
@@ -1737,202 +1777,6 @@ function initSectionDividers() {
     sec.style.position = 'relative';
     sec.appendChild(divider);
   });
-}
-
-/* ---------- 卡片堆叠滚动效果（pin + cover）----------
-   思路：所有 section 默认 relative 在文档流中正常滚动，
-   当某张 section 底部到达视口底部（用户已看完该 section 内容）时切换成 fixed
-   并用一张占位 div 撑开文档流；下一张卡片从下方滑上来盖住它；
-   下一张顶边到达 top:0 时该 section 释放 fixed 回到文档流，由下一张接管。
-*/
-function initCardStack() {
-  // hero / works / about / contact 依次堆叠：下一张从下方滑上来盖住上一张
-  const sections = document.querySelectorAll('section.hero, section.works, section.about, section.contact');
-  if (!sections.length) return;
-
-  const sectionsArr = Array.from(sections);
-  const cards = sectionsArr;
-
-  // 先清掉可能的残留 spacer（浏览器刷新/热更新时会留下旧 spacer）
-  document.querySelectorAll('.stack-spacer').forEach(s => s.remove());
-
-  // 为每个会被 pin 的 section 在它前面插一个占位 div
-  sectionsArr.forEach((sec) => {
-    const spacer = document.createElement('div');
-    spacer.className = 'stack-spacer';
-    sec.parentNode.insertBefore(spacer, sec);
-    sec._spacer = spacer;
-  });
-
-  // 测量：所有样式重置 + spacer 收起后记录每张卡片在文档流中的位置和高度
-  const measure = () => {
-    sectionsArr.forEach((sec) => {
-      sec.style.position = '';
-      sec.style.top = '';
-      sec.style.left = '';
-      sec.style.width = '';
-      sec.style.transform = '';
-      sec.style.filter = '';
-      sec.style.transition = '';
-      if (sec._spacer) sec._spacer.style.height = '0';
-    });
-    cards.forEach((card) => {
-      const rect = card.getBoundingClientRect();
-      card._top = rect.top + window.scrollY;
-      card._height = rect.height;
-      // 预计算：当 pin 时 sec 的 fixed top 值（确定性，不依赖运行时测量）
-      const pinStart = Math.max(card._top, card._top + card._height - window.innerHeight);
-      card._pinTop = card._top - pinStart; // 这是个常数！
-    });
-  };
-
-  // 缓存 About / Works 背景值，避免每帧重绘（backdropFilter 非常贵）
-  let _aboutBgKey = '';
-  let _worksBgKey = '';
-
-  const update = () => {
-    const vh = window.innerHeight;
-    const scrollY = window.scrollY;
-
-    // 倒序遍历：先 pin 后面的 section 再释放前面的，防止 spacer 高度差导致的文档流跳动
-    // （如果 aboutHeight != worksHeight，先 pin About 固定它，再释放 Works）
-    for (let i = sectionsArr.length - 1; i >= 0; i--) {
-      const sec = sectionsArr[i];
-      const next = cards[i + 1];
-      if (!next) continue;
-
-      const secTop = sec._top;
-      const secHeight = sec._height;
-      const secBottom = secTop + secHeight;
-      const nextTop = next._top;
-
-      const pinStart = Math.max(secTop, secBottom - vh);
-      const pinEnd = nextTop;
-
-      let spacerH = 0;
-
-      if (scrollY < pinStart) {
-sec.style.position = '';
-sec.style.top = '';
-sec.style.left = '';
-sec.style.width = '';
-sec.style.transform = '';
-sec.style.filter = '';
-sec.style.transition = '';
-spacerH = 0;
-      } else if (scrollY < pinEnd) {
-const nextTopInView = nextTop - scrollY;
-const progress = Math.max(0, Math.min(1, (vh - nextTopInView) / vh));
-const brightness = 1 - progress * 0.25;
-// pin 切换不再碰 reveal —— 让 observer 动画自然完成
-sec.style.transition = 'none';
-sec.style.position = 'fixed';
-sec.style.top = sec._pinTop + 'px';
-sec.style.left = '0';
-sec.style.width = '100%';
-sec.style.transform = '';
-// hero 上有大量动画元素，不加 brightness 滤层，避免手机上多一层全屏合成
-sec.style.filter = sec.classList.contains('hero') ? '' : `brightness(${brightness})`;
-spacerH = secHeight;
-      } else {
-sec.style.position = '';
-sec.style.top = '';
-sec.style.left = '';
-sec.style.width = '';
-sec.style.transform = '';
-sec.style.filter = '';
-sec.style.transition = '';
-spacerH = 0;
-      }
-
-      if (sec._spacer) sec._spacer.style.height = spacerH + 'px';
-    }
-
-    const works = document.querySelector('section.works');
-    const about = document.querySelector('section.about');
-
-    // Works 背景渐变：半透模糊 → 实色，随 Hero 被盖住的进度平滑过渡
-    // （Works 本身透明，不处理的话首屏内容会从下面透出来）
-    const hero = document.querySelector('section.hero');
-    if (hero && works && hero._top !== undefined && works._top !== undefined) {
-      const hBottom = hero._top + hero._height;
-      const hStart = Math.max(hero._top, hBottom - vh);
-      const hEnd = works._top;
-
-      let hProgress;
-      if (scrollY <= hStart) {
-        hProgress = 0;
-      } else if (scrollY >= hEnd) {
-        hProgress = 1;
-      } else {
-        hProgress = (scrollY - hStart) / Math.max(1, hEnd - hStart);
-      }
-
-      const hBlur = Math.round(28 * (1 - hProgress) * 10) / 10;
-      const hAlpha = Math.round((0.78 + 0.22 * hProgress) * 1000) / 1000;
-      const hKey = hBlur + '|' + hAlpha;
-      if (hKey !== _worksBgKey) {
-        _worksBgKey = hKey;
-        works.style.background = `rgba(236, 233, 227, ${hAlpha})`;
-        works.style.backdropFilter = `blur(${hBlur}px)`;
-        works.style.webkitBackdropFilter = `blur(${hBlur}px)`;
-      }
-    }
-
-    // About 背景渐变：半透模糊 → 实色，随 Works 被盖住的进度平滑过渡
-    if (works && about && works._top !== undefined && about._top !== undefined) {
-      const wTop = works._top;
-      const wBottom = wTop + works._height;
-      const wPinStart = Math.max(wTop, wBottom - vh);
-      const wPinEnd = about._top;
-
-      let progress;
-      if (scrollY <= wPinStart) {
-progress = 0;
-      } else if (scrollY >= wPinEnd) {
-progress = 1;
-      } else {
-progress = (scrollY - wPinStart) / (wPinEnd - wPinStart);
-      }
-
-      const blurPx = Math.round(48 * (1 - progress) * 10) / 10;
-      const bgAlpha = Math.round((0.55 + 0.45 * progress) * 1000) / 1000;
-      const key = blurPx + '|' + bgAlpha;
-      if (key !== _aboutBgKey) {
-_aboutBgKey = key;
-about.style.background = `rgba(236, 233, 227, ${bgAlpha})`;
-about.style.backdropFilter = `blur(${blurPx}px)`;
-about.style.webkitBackdropFilter = `blur(${blurPx}px)`;
-      }
-    }
-  };
-
-  measure();
-  update();
-
-  // 暴露给外部（如过滤切换后）重新测量
-  window.__restack = () => { measure(); update(); };
-
-  let ticking = false;
-  const onScroll = () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-update();
-ticking = false;
-      });
-      ticking = true;
-    }
-  };
-  let resizeTimer;
-  const onResize = () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      measure();
-      update();
-    }, 200);
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onResize, { passive: true });
 }
 
 /* ---------- 加载动画 —— 百分比计数 + 拉窗入场 ---------- */
