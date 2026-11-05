@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#16110c">
   <!-- 内联预置样式：防 FOUC + 确保 loader 最先出现 -->
   <style>html.fonts-ready{visibility:visible}body.loader-active{position:fixed;inset:0;overflow-y:scroll}</style>
-  <link rel="stylesheet" href="styles.css?v=social10">
+  <link rel="stylesheet" href="styles.css?v=social13">
   <!-- 噪点滤镜 SVG 定义 -->
   </head><body class="hero-in filter-illustration"><svg class="noise-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
     <filter id="noiseFilter">
@@ -351,7 +351,6 @@
   <!-- ============ 邮件弹窗卡片 ============ -->
   <div class="mail-modal" id="mailModal" aria-hidden="true">
     <div class="mail-modal-card" role="dialog" aria-modal="true">
-      <button class="mail-modal-close" type="button" aria-label="关闭"></button>
       <div class="mail-modal-head">
         <span class="mail-modal-label">Email</span>
         <h3 class="mail-modal-title">2296688205@qq.com</h3>
@@ -390,7 +389,6 @@
   <!-- ============ 技能弹窗 ============ -->
   <div class="skill-modal" id="skillModal" aria-hidden="true">
     <div class="skill-modal-card" role="dialog" aria-modal="true">
-      <button class="skill-modal-close" type="button" aria-label="关闭"></button>
       <div class="skill-modal-head">
         <div class="skill-modal-icon" id="skillModalIcon"></div>
         <div class="skill-modal-meta">
@@ -405,7 +403,7 @@
         <p class="skill-modal-desc" id="skillModalDesc"></p>
       </div>
       <div class="skill-modal-foot">
-        <span class="hint-desk">点击空白处或 ESC 关闭</span>
+        <span class="hint-desk">点击空白处关闭</span>
         <span class="hint-touch">轻触空白处关闭</span>
       </div>
     </div>
@@ -462,7 +460,7 @@
   <!-- ?v 参数用于强刷缓存：script.js 改动后旧版本会被浏览器缓存，
        导航落点无缝对齐等修复不生效，必须换 URL 强制重新拉取 -->
   <script src="assets/dither/Dither.js"></script>
-  <script src="script.js?v=social7"></script>
+  <script src="script.js?v=social10"></script>
 
 
 

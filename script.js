@@ -1086,10 +1086,10 @@ function initMailModal() {
   const btn = document.querySelector('.contact-send-btn');
   const modal = document.getElementById('mailModal');
   if (!btn || !modal) return;
-  const closeBtn = modal.querySelector('.mail-modal-close');
   const copyBtn = document.getElementById('copyMailBtn');
   const copyTip = document.getElementById('copyTip');
   let savedScroll = 0;
+  let pressTimer = 0;
 
   const open = () => {
     modal.classList.add('open');
@@ -1100,6 +1100,8 @@ function initMailModal() {
   };
   const close = () => {
     document.activeElement?.blur();
+    clearTimeout(pressTimer);
+    btn.classList.remove('is-pressed');
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('has-modal');
@@ -1107,8 +1109,15 @@ function initMailModal() {
     if (copyTip) copyTip.textContent = '';
   };
 
-  btn.addEventListener('click', open);
-  closeBtn && closeBtn.addEventListener('click', close);
+  btn.addEventListener('click', () => {
+    // 触屏：播放一次“按下”反馈，动画结束后自动回默认态
+    if (_isTouchDevice) {
+      btn.classList.add('is-pressed');
+      clearTimeout(pressTimer);
+      pressTimer = setTimeout(() => btn.classList.remove('is-pressed'), 520);
+    }
+    open();
+  });
   // 点击遮罩关闭
   bindBackdropClose(modal, close);
   // 复制邮箱
@@ -1137,7 +1146,6 @@ copyTip.textContent = '✓ 邮箱地址已复制到剪贴板';
 function initSkillModal() {
   const modal = document.getElementById('skillModal');
   if (!modal) return;
-  const closeBtn = modal.querySelector('.skill-modal-close');
   const titleEl = modal.querySelector('#skillModalTitle');
   const levelEl = modal.querySelector('#skillModalLevel');
   const descEl = modal.querySelector('#skillModalDesc');
@@ -1171,14 +1179,17 @@ function initSkillModal() {
   };
 
   document.querySelectorAll('.tool-tag').forEach(tag => {
-    tag.addEventListener('click', () => open(tag));
+    tag.addEventListener('click', () => {
+      // 触屏：播放一次反色反馈，动画结束后自动回默认态（避免 hover 残留成白色）
+      if (_isTouchDevice) {
+        tag.classList.add('is-tapped');
+        clearTimeout(tag._tapTimer);
+        tag._tapTimer = setTimeout(() => tag.classList.remove('is-tapped'), 520);
+      }
+      open(tag);
+    });
   });
-  closeBtn && closeBtn.addEventListener('click', close);
   bindBackdropClose(modal, close);
-  // ESC 关闭仅桌面端
-  if (!_isTouchDevice) {
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
-  }
 }
 
 /* ---------- 技能行手风琴 ---------- */

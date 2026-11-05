@@ -2350,34 +2350,6 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 .mail-modal.open .mail-modal-card {
   transform: translateY(0) scale(1);
 }
-.mail-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  cursor: pointer;
-  transition: color 0.15s;
-}
-.mail-modal-close::before,
-.mail-modal-close::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 18px;
-  height: 1.5px;
-  background: currentColor;
-  border-radius: 1px;
-}
-.mail-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.mail-modal-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-.mail-modal-close:hover {
-  color: #fff;
-}
 .mail-modal-head {
   border-bottom: 1px dashed rgba(255,255,255,0.3);
   padding-bottom: 20px;
@@ -2489,34 +2461,6 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 }
 .skill-modal.open .skill-modal-card {
   transform: translateY(0) scale(1);
-}
-.skill-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  cursor: pointer;
-  transition: color 0.15s;
-}
-.skill-modal-close::before,
-.skill-modal-close::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 18px;
-  height: 1.5px;
-  background: currentColor;
-  border-radius: 1px;
-}
-.skill-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.skill-modal-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-.skill-modal-close:hover {
-  color: #fff;
 }
 .skill-modal-head {
   display: flex;
@@ -2983,6 +2927,14 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
 .touch-device .contact-send-btn:hover .contact-btn-inner { transform: none !important; }
 .touch-device .contact-send-btn:hover .contact-btn-arrow { opacity: 0 !important; transform: translate(-70px, -50%) !important; }
 
+/* 触屏点按反馈：短暂播放“按下”效果后自动回默认 */
+.touch-device .contact-send-btn.is-pressed {
+  transform: scale(0.94) !important;
+  filter: brightness(1.15) !important;
+}
+.touch-device .contact-send-btn.is-pressed .contact-btn-inner { transform: translateX(96px) scale(0.9) !important; }
+.touch-device .contact-send-btn.is-pressed .contact-btn-arrow { opacity: 1 !important; transform: translate(0, -50%) !important; }
+
 .contact-notice {
   position: absolute;
   right: 0;
@@ -3440,11 +3392,6 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
     width: 88vw !important;
     padding: 28px 24px 24px !important;
   }
-  .skill-modal-close {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 20px !important;
-  }
   .skill-modal-title {
     font-size: 16px !important;
   }
@@ -3464,11 +3411,6 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
   .mail-modal-card {
     width: 88vw !important;
     padding: 28px 24px 24px !important;
-  }
-  .mail-modal-close {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 20px !important;
   }
   .mail-modal-title {
     font-size: 18px !important;
@@ -3568,6 +3510,13 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
     opacity: 1;
     transform: translate(-30px, -50%);
   }
+  /* 触屏点按反馈（手机版尺寸） */
+  .touch-device .contact-send-btn.is-pressed {
+    transform: scale(0.92) !important;
+    filter: brightness(1.15) !important;
+  }
+  .touch-device .contact-send-btn.is-pressed .contact-btn-inner { transform: translateX(28px) !important; }
+  .touch-device .contact-send-btn.is-pressed .contact-btn-arrow { opacity: 1 !important; transform: translate(-30px, -50%) !important; }
 
   .contact-lead-cn { font-size: clamp(22px, 6vw, 36px); padding-bottom: 16px; }
   .contact-lead-en { font-size: clamp(8px, 2.2vw, 10px) !important; margin-top: 8px; max-width: 80%; margin-left: auto; }
@@ -3934,15 +3883,9 @@ body.filter-graphic    .xiaohei-cat {
 
   .tool-tag:hover,
   .tool-tag:focus,
-  .tool-tag:focus-visible { background: var(--bg-light); color: var(--ink); border-color: var(--line-dark); }
-  .tool-tag:active { background: #1a1a1e !important; color: #fff !important; border-color: #1a1a1e !important; transform: scale(0.94); }
-
-  /* 弹窗内所有按钮：触屏上 hover/focus 强制清除，:active 短暂高亮回馈 */
-  .skill-modal-close:hover, .skill-modal-close:focus, .skill-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
-  .skill-modal-close:active { color: #fff !important; }
-
-  .mail-modal-close:hover, .mail-modal-close:focus, .mail-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
-  .mail-modal-close:active { color: #fff !important; }
+  .tool-tag:focus-visible { background: transparent; color: var(--ink-on-light); border-color: var(--line-light); }
+  .tool-tag:active,
+  .tool-tag.is-tapped { background: #1a1a1e !important; color: #fff !important; border-color: #1a1a1e !important; transform: scale(0.94); }
 
   .work-modal-nav { opacity: 1 !important; }
   .work-modal-nav:hover, .work-modal-nav:focus, .work-modal-nav:focus-visible {
