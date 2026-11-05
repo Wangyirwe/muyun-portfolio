@@ -2624,35 +2624,6 @@ body.filter-packaging .work-card[data-work="7"] .work-placeholder > .illust-card
 .work-modal.open .work-modal-card {
   transform: translateY(0) scale(1);
 }
-.work-modal-close {
-  position: absolute;
-  top: clamp(8px, 1.5vh, 18px);
-  right: clamp(8px, 1.5vw, 20px);
-  width: clamp(28px, 3.5vw, 40px);
-  height: clamp(28px, 3.5vw, 40px);
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  cursor: pointer;
-  transition: color 0.15s;
-  z-index: 2;
-}
-.work-modal-close::before,
-.work-modal-close::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: clamp(16px, 2vw, 22px);
-  height: 1.5px;
-  background: currentColor;
-  border-radius: 1px;
-}
-.work-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.work-modal-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-.work-modal-close:hover {
-  color: #fff;
-}
 .work-modal-media {
   flex: 1.3;
   min-height: 420px;
@@ -3007,6 +2978,11 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
 .contact-send-btn:active { transform: scale(0.94); filter: brightness(1.15); transition: transform .12s ease, filter .12s ease; }
 .contact-send-btn:active .contact-btn-inner { transform: translateX(96px) scale(0.9); }
 
+/* 触屏设备（JS 已给 <html> 打 touch-device 标记）：清掉粘住的 :hover，点按结束回到默认态 */
+.touch-device .contact-send-btn:hover { transform: none !important; filter: none !important; }
+.touch-device .contact-send-btn:hover .contact-btn-inner { transform: none !important; }
+.touch-device .contact-send-btn:hover .contact-btn-arrow { opacity: 0 !important; transform: translate(-70px, -50%) !important; }
+
 .contact-notice {
   position: absolute;
   right: 0;
@@ -3021,8 +2997,35 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
   max-width: 360px;
 }
 
-.contact-notice-mobile {
-  display: none;
+/* 联系弹窗 · 社交图标（深色卡片上用白色描边 + 白色图标） */
+.mail-socials {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.social-icon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: transform .18s ease-out, border-color .18s ease-out;
+}
+.social-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+/* 点击反馈：仅放大回弹，不变色 */
+.social-icon.is-bump {
+  transform: scale(1.16);
 }
 
 .contact-main {
@@ -3584,7 +3587,8 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
   .contact-lead { margin-top: 0; margin-bottom: 32px; position: relative; z-index: 2; text-align: right; }
   .contact-send-btn { position: relative; margin-top: 120px; margin-left: auto; margin-right: 0; bottom: auto; right: auto; display: block; width: fit-content; }
   .contact-notice { position: static; margin-top: 24px; font-size: 7px; max-width: 180px; line-height: 1.3; letter-spacing: .06em; text-align: right; margin-left: auto; margin-right: 0; }
-  .contact-notice-mobile { display: block; font-family: var(--font-mono); font-size: 7px; letter-spacing: .06em; color: var(--ink-muted); text-align: right; margin-top: 6px; margin-left: auto; margin-right: 0; }
+  .social-icon { width: 36px; height: 36px; }
+  .social-icon svg { width: 16px; height: 16px; }
   .contact { padding-bottom: 40px; }
   .hanging-phone { display: none !important; }
   .phone-booth-img { display: none !important; }
@@ -3934,9 +3938,6 @@ body.filter-graphic    .xiaohei-cat {
   .tool-tag:active { background: #1a1a1e !important; color: #fff !important; border-color: #1a1a1e !important; transform: scale(0.94); }
 
   /* 弹窗内所有按钮：触屏上 hover/focus 强制清除，:active 短暂高亮回馈 */
-  .work-modal-close:hover, .work-modal-close:focus, .work-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
-  .work-modal-close:active { color: #fff !important; }
-
   .skill-modal-close:hover, .skill-modal-close:focus, .skill-modal-close:focus-visible { color: rgba(255,255,255,0.5) !important; outline: none !important; }
   .skill-modal-close:active { color: #fff !important; }
 
@@ -3954,6 +3955,17 @@ body.filter-graphic    .xiaohei-cat {
 
   .mail-modal-btn:hover, .mail-modal-btn:focus, .mail-modal-btn:focus-visible { background: transparent !important; color: inherit !important; outline: none !important; }
   .mail-modal-btn:active { background: rgba(255,255,255,0.1) !important; }
+
+  /* 联系按钮：触屏上 :hover 会一直粘住，这里强制清掉，点按结束即回到默认态 */
+  .contact-send-btn:hover,
+  .contact-send-btn:focus,
+  .contact-send-btn:focus-visible { transform: none !important; filter: none !important; outline: none !important; }
+  .contact-send-btn:hover .contact-btn-inner,
+  .contact-send-btn:focus .contact-btn-inner,
+  .contact-send-btn:focus-visible .contact-btn-inner { transform: none !important; }
+  .contact-send-btn:hover .contact-btn-arrow,
+  .contact-send-btn:focus .contact-btn-arrow,
+  .contact-send-btn:focus-visible .contact-btn-arrow { opacity: 0 !important; transform: translate(-70px, -50%) !important; }
 
   /* 禁用卡片 parallax — 触屏没有鼠标 */
   .work-placeholder > *:not(.gmrk) {

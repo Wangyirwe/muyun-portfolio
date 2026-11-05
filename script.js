@@ -1055,6 +1055,32 @@ navMatches: document.querySelectorAll('.nav').length
 })();
 
 /* ---------- 罗小黑眼睛跟随鼠标 ---------- */
+/* ---------- 弹窗遮罩关闭：触屏不穿透 ---------- */
+// 触屏点空白时若在 touchstart 就关闭弹窗，遮罩会立刻消失，
+// 同一根手指抬起后合成的 click 会落到下层页面元素（幽灵点击）。
+// 因此改为 touchend 关闭 + preventDefault 抑制合成 click。
+function bindBackdropClose(modal, close) {
+  const card = modal.querySelector('[role="dialog"]');
+  const onBackdrop = (e) => e.target === modal || !card.contains(e.target);
+  let touched = false;
+
+  modal.addEventListener('touchstart', (e) => { touched = onBackdrop(e); }, { passive: true });
+  modal.addEventListener('touchcancel', () => { touched = false; }, { passive: true });
+
+  modal.addEventListener('touchend', (e) => {
+    if (!touched) return;
+    touched = false;
+    e.preventDefault();
+    // 兜底：个别浏览器仍会补发 click，一并吞掉
+    const swallow = (ev) => { ev.preventDefault(); ev.stopPropagation(); };
+    document.addEventListener('click', swallow, { capture: true, once: true });
+    setTimeout(() => document.removeEventListener('click', swallow, { capture: true }), 500);
+    close();
+  }, { passive: false });
+
+  modal.addEventListener('click', (e) => { if (onBackdrop(e)) close(); });
+}
+
 /* ---------- 邮件弹窗 ---------- */
 function initMailModal() {
   const btn = document.querySelector('.contact-send-btn');
@@ -1084,12 +1110,7 @@ function initMailModal() {
   btn.addEventListener('click', open);
   closeBtn && closeBtn.addEventListener('click', close);
   // 点击遮罩关闭
-  let $modalTouch = false; modal.addEventListener('touchstart', (e) => { if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) { $modalTouch = true; close(); } }); modal.addEventListener('click', (e) => { if ($modalTouch) { $modalTouch = false; return; } if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close(); });
-  // ESC 关闭仅桌面端
-  if (!_isTouchDevice) {
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
-  }
-
+  bindBackdropClose(modal, close);
   // 复制邮箱
   if (copyBtn) {
     copyBtn.addEventListener('click', async () => {
@@ -1153,7 +1174,7 @@ function initSkillModal() {
     tag.addEventListener('click', () => open(tag));
   });
   closeBtn && closeBtn.addEventListener('click', close);
-  let $modalTouch = false; modal.addEventListener('touchstart', (e) => { if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) { $modalTouch = true; close(); } }); modal.addEventListener('click', (e) => { if ($modalTouch) { $modalTouch = false; return; } if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close(); });
+  bindBackdropClose(modal, close);
   // ESC 关闭仅桌面端
   if (!_isTouchDevice) {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
@@ -1255,7 +1276,6 @@ function initWorkModal() {
   const tagEl = document.getElementById('workModalTag');
   const kwEl = document.getElementById('workModalKeywords');
   const detailEl = document.getElementById('workModalDetail');
-  const closeBtn = modal.querySelector('.work-modal-close');
   let savedScroll = 0;
 
   // 图片缩放/拖动状态
@@ -1566,22 +1586,7 @@ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(card); }
   const origRender = renderWorks;
   renderWorks = function() { origRender(); bindCards(); };
 
-  closeBtn && closeBtn.addEventListener('click', close);
-  // backdrop 拦截触摸点空白关闭；不阻止默认行为，让 media 内部 touch 拖动正常工作
-  let $modalTouch = false;
-  modal.addEventListener('touchstart', (e) => {
-    if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) {
-      $modalTouch = true; close();
-    }
-  });
-  modal.addEventListener('click', (e) => {
-    if ($modalTouch) { $modalTouch = false; return; }
-    if (e.target === modal || !modal.querySelector('[role="dialog"]').contains(e.target)) close();
-  });
-  // ESC 关闭仅桌面端：触屏设备没有物理键盘，点空白关闭
-  if (!_isTouchDevice) {
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
-  }
+  bindBackdropClose(modal, close);
 }
 
 function initXiaohei() {
@@ -1752,7 +1757,36 @@ else el.style.removeProperty('font-size');
   initSkillAccordion();
   initWorkModal();
   initAboutPhotoParallax();
+  initSocialLinks();
 });
+
+/* ---------- 联系弹窗社交图标 ---------- */
+// 每个平台填主页链接即可跳转；留空则点击不生效（只保留放大反馈）。
+const SOCIAL_PROFILES = {
+  wechat: '',
+  qq:     '',
+  weibo:  '',
+  douyin: '',
+  xhs:    ''
+};
+
+function initSocialLinks() {
+  const wrap = document.querySelector('.mail-socials');
+  if (!wrap) return;
+
+  wrap.querySelectorAll('.social-icon').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      // 点击反馈：放大一下再回弹
+      btn.classList.add('is-bump');
+      setTimeout(() => btn.classList.remove('is-bump'), 300);
+
+      const url = SOCIAL_PROFILES[btn.dataset.social];
+      if (!url) return;
+      window.open(url, '_blank', 'noopener');
+    });
+  });
+}
+
 
 /* ---------- 各页面顶部黑色切割线 ---------- */
 function initSectionDividers() {
