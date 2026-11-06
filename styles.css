@@ -2975,9 +2975,15 @@ html.touch-device .work-modal-media:hover .work-modal-nav {
   height: 18px;
   display: block;
 }
-/* 点击反馈：仅放大回弹，不变色 */
-.social-icon.is-bump {
-  transform: scale(1.16);
+/* 点击反馈：按压一下（缩小）再回弹到默认大小 */
+@keyframes socialIconPress {
+  0%   { transform: scale(1); }
+  28%  { transform: scale(0.88); }
+  62%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.social-icon.is-pressed {
+  animation: socialIconPress .36s cubic-bezier(.33,.02,.36,1) both;
 }
 
 .contact-main {

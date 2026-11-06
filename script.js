@@ -1787,9 +1787,10 @@ function initSocialLinks() {
 
   wrap.querySelectorAll('.social-icon').forEach((btn) => {
     btn.addEventListener('click', () => {
-      // 点击反馈：放大一下再回弹
-      btn.classList.add('is-bump');
-      setTimeout(() => btn.classList.remove('is-bump'), 300);
+      // 点击反馈：按压一下再回弹（动画 360ms 播完后移除 class）
+      btn.classList.add('is-pressed');
+      clearTimeout(btn._pressT);
+      btn._pressT = setTimeout(() => btn.classList.remove('is-pressed'), 380);
 
       const url = SOCIAL_PROFILES[btn.dataset.social];
       if (!url) return;
